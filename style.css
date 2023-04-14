@@ -1,0 +1,21 @@
+* {
+    /*padding: 0;
+    margin: 0;
+    background-color: black;
+    color: white;*/
+}
+
+.board {
+    box-sizing: border-box;
+    display: flex;
+}
+
+.square {
+    width: 10px;
+    height: 10px;
+    border: 0.5px solid black;
+}
+
+.snake { 
+    background-color: black;
+}
