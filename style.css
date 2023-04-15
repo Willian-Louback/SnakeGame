@@ -18,3 +18,7 @@
 .snake { 
     background-color: #4c0075;
 }
+
+.food {
+    background-color: red;
+}
