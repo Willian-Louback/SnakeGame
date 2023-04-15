@@ -163,7 +163,7 @@ class Cell {
     }
 }
 
-let board = new Board(10, 10);
+const board = new Board(10, 10);
 const cell = new Cell();
 
 board.build();
