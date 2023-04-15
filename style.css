@@ -6,7 +6,6 @@
 }
 
 .board {
-    box-sizing: border-box;
     display: flex;
 }
 
@@ -17,5 +16,5 @@
 }
 
 .snake { 
-    background-color: black;
+    background-color: #4c0075;
 }

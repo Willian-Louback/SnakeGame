@@ -1,5 +1,3 @@
-let keySwitch = "ArrowRight";
-
 class Board {
     constructor(column, line){
         this.column = column;
@@ -26,12 +24,35 @@ class Snake {
         this.line = x;
     }
 
+    velocidade = 240;
+    setTimeout = "";
+    keySwitch = "ArrowRight";
+
     render(){
-        /*document.addEventListener("keydown", (target) => {
-            cell.render(target.key);
-        })*/
-        
-        cell.render(keySwitch);
+        cell.render(this.keySwitch);
+        this.setTimeout = setInterval(cell.render.bind(cell, this.keySwitch), this.velocidade);
+    }
+
+    mov(){
+        document.addEventListener("keydown", (target) => {
+            if(target.key === this.keySwitch){
+                return;
+            }
+
+            if(
+                (target.key === "ArrowRight" && this.keySwitch === "ArrowLeft") ||
+                (target.key === "ArrowUp" && this.keySwitch === "ArrowDown") ||
+                (target.key === "ArrowDown" && this.keySwitch === "ArrowUp") ||
+                (target.key === "ArrowLeft" && this.keySwitch === "ArrowRight")
+            ){
+                return;
+            }
+
+            console.log("foi")
+            clearInterval(this.setTimeout);
+            this.keySwitch = target.key;
+            this.render();
+        })
     }
 }
 
@@ -39,9 +60,9 @@ class Cell {
     constructor(){}
     
     snake = [
-        new Snake(5, 0),
-        new Snake(6, 0),
-        new Snake(7, 0)
+        new Snake(0, 0),
+        new Snake(1, 0),
+        new Snake(2, 0)
     ]
 
     snakeManipulador = new Snake(0,0);
@@ -51,7 +72,7 @@ class Cell {
             document.querySelector(`#c${this.snake[i].column}l${this.snake[i].line}`).classList.add('snake');
         }
 
-        this.snakeManipulador.render();
+        this.snakeManipulador.mov();
     }
 
     render(key){
@@ -87,18 +108,13 @@ class Cell {
                 }
                 return;
         }
-        console.log("aqui", this.snake)
-        keySwitch = key;
-        setInterval(this.draw.bind(this), 1300);
+        this.draw();
     }
 
     draw(){
-        console.log("chegou", this.snake)
         document.querySelector(`#c${this.snake[this.snake.length - 1].column}l${this.snake[this.snake.length - 1].line}`).classList.add('snake');
         document.querySelector(`#c${this.snake[0].column}l${this.snake[0].line}`).classList.remove('snake');
         this.snake.shift();
-        console.log("teste")
-        this.snakeManipulador.render();
     }
 }
 
