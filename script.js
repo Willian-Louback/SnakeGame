@@ -34,6 +34,33 @@ class Snake {
         this.setTimeout = setInterval(cell.render.bind(cell, this.keySwitch, this.stop), this.velocidade);
     }
 
+    movButton(clicked){
+        if(this.firstTime === true && clicked === "ArrowLeft"){
+            return;
+        }
+
+        if(clicked === this.keySwitch){
+            return;
+        }
+
+        if(this.firstTime === false){
+            if(
+                (clicked === "ArrowRight" && this.keySwitch === "ArrowLeft") ||
+                (clicked === "ArrowUp" && this.keySwitch === "ArrowDown") ||
+                (clicked === "ArrowDown" && this.keySwitch === "ArrowUp") ||
+                (clicked === "ArrowLeft" && this.keySwitch === "ArrowRight")
+            ){
+                return;
+            }
+        } else {
+            this.firstTime = false;
+        }
+
+        clearInterval(this.setTimeout);
+        this.keySwitch = clicked;
+        this.render();
+    }
+
     mov(){
         document.addEventListener("keydown", (target) => {
             if(target.key.indexOf("Arrow") !== 0){
@@ -43,6 +70,7 @@ class Snake {
             if(target.key === this.keySwitch){
                 return;
             }
+
             if(this.firstTime === false){
                 if(
                     (target.key === "ArrowRight" && this.keySwitch === "ArrowLeft") ||
