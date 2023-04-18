@@ -19,8 +19,8 @@ main {
 .board {
     display: grid;
     margin-top: 5%;
-    width: 416px;
-    height: 400px;
+    width: 516px;
+    height: 500px;
     border: 1px solid black;
     border-radius: 3px;
     background-color: rgba(0, 0, 0, 0.938);
@@ -33,8 +33,7 @@ main {
     height: 100%;
 }
 
-.snake { 
-    /*background-color: #4c0075;*/
+.snake {
     background-color: #8e0eff;
     width: 93%;
     height: 93%;

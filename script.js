@@ -23,7 +23,7 @@ class Snake {
         this.line = x;
     }
 
-    velocidade = 290;
+    velocidade = 190;
     setTimeout = "";
     keySwitch = "ArrowLeft";
     firstTime = true;
@@ -160,7 +160,6 @@ class Cell {
             return;
         } else if(this.headSnake.classList.contains("food")){
             this.headSnake.classList.remove("food");
-            console.log(this.snake.length)
             if((this.snake.length) < (board.column * board.line)){
                 this.foods();
             }
@@ -177,7 +176,7 @@ class Cell {
     }
 }
 
-const board = new Board(5, 5);
+const board = new Board(10, 10);
 const cell = new Cell();
 
 board.build();
