@@ -6,13 +6,12 @@ class Board {
 
     build(){
         const main = document.querySelector(".board");
-
+        main.style.gridTemplateColumns = `repeat(${this.column}, 1fr)`;
+        main.style.gridTemplateRows = `repeat(${this.line}, 1fr)`;
         for(let i = 0; i < this.column; i++){
-            main.appendChild(document.createElement("div")).classList.add("column");
             for(let j = 0; j < this.line; j++){
-                const column = document.querySelectorAll(".column");
-                column[i].appendChild(document.createElement("div")).classList.add("square");
-                column[i].lastChild.id= `c${i}l${j}`;
+                main.appendChild(document.createElement("div")).classList.add("square");
+                main.lastChild.id = `c${j}l${i}`;
             }
         }
     }
@@ -24,7 +23,7 @@ class Snake {
         this.line = x;
     }
 
-    velocidade = 240;
+    velocidade = 290;
     setTimeout = "";
     keySwitch = "ArrowLeft";
     firstTime = true;
@@ -64,9 +63,16 @@ class Snake {
     }
 
     gameOver(){
-        this.stop === false ? alert("você perdeu!") : null;
+        this.stop === false ? alert("Você perdeu!") : null;
         this.stop = true;
         clearInterval(this.setTimeout); // Há um problema aqui (O algoritmo faz o primeiro cell.render, e antes dele finalizar o cell.render com o timeout, ele chega aqui, aí o clearInterval não funciona.)
+        return;
+    }
+
+    win(){
+        this.stop === false ? alert("Você ganhou!") : null;
+        this.stop = true;
+        clearInterval(this.setTimeout);
         return;
     }
 }
@@ -148,14 +154,22 @@ class Cell {
         this.headSnake = document.querySelector(`#c${this.snake[this.snake.length - 1].column}l${this.snake[this.snake.length - 1].line}`);
         this.headSnake.classList.add('snake');
 
-        if(this.headSnake.classList.contains("food")){
+        if((this.snake.length - 1) === (board.column * board.line)) {
             this.headSnake.classList.remove("food");
-            this.foods();
+            this.snakeManipulador.win(); 
+            return;
+        } else if(this.headSnake.classList.contains("food")){
+            this.headSnake.classList.remove("food");
+            console.log(this.snake.length)
+            if((this.snake.length) < (board.column * board.line)){
+                this.foods();
+            }
         } else {
             if(this.headSnake.classList.contains("body")){
-                this.snakeManipulador.gameOver(this);
+                this.snakeManipulador.gameOver();
                 return;
             }
+
             document.querySelector(`#c${this.snake[0].column}l${this.snake[0].line}`).classList.remove('snake');
             document.querySelector(`#c${this.snake[0].column}l${this.snake[0].line}`).classList.remove('body');
             this.snake.shift();
@@ -163,7 +177,7 @@ class Cell {
     }
 }
 
-const board = new Board(10, 10);
+const board = new Board(5, 5);
 const cell = new Cell();
 
 board.build();
