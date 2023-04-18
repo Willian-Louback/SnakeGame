@@ -23,7 +23,7 @@ class Snake {
         this.line = x;
     }
 
-    velocidade = 190;
+    velocidade = 220;
     setTimeout = "";
     keySwitch = "ArrowLeft";
     firstTime = true;
@@ -35,10 +35,6 @@ class Snake {
     }
 
     movButton(clicked){
-        if(this.firstTime === true && clicked === "ArrowLeft"){
-            return;
-        }
-
         if(clicked === this.keySwitch){
             return;
         }

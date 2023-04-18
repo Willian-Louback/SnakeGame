@@ -238,8 +238,8 @@ main {
     }
  
     button {
-        height: 55px;
-        width: 55px;
+        height: 90px;
+        width: 90px;
         border-radius: 10px;
         font-size: 25px;
         background-color: black;
