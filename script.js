@@ -30,7 +30,7 @@ class Snake {
     stop = false;
 
     render(){
-        cell.render(this.keySwitch, this.stop)
+        cell.render(this.keySwitch, this.stop);
         this.setTimeout = setInterval(cell.render.bind(cell, this.keySwitch, this.stop), this.velocidade);
     }
 
@@ -90,6 +90,7 @@ class Cell {
     food = [null, null];
     headSnake = "";
     stop = false;
+    score = new Score(0);
     
     build(){
         for(let i = 0; i < this.snake.length; i++){
@@ -160,6 +161,7 @@ class Cell {
             return;
         } else if(this.headSnake.classList.contains("food")){
             this.headSnake.classList.remove("food");
+            this.score.calcularScore();
             if((this.snake.length) < (board.column * board.line)){
                 this.foods();
             }
@@ -173,6 +175,18 @@ class Cell {
             document.querySelector(`#c${this.snake[0].column}l${this.snake[0].line}`).classList.remove('body');
             this.snake.shift();
         }
+    }
+}
+
+class Score {
+    constructor(score){
+        this.score = score;
+    }
+
+    calcularScore(){
+        console.log(this.score)
+        this.score += 10;
+        document.querySelector("#score").innerHTML = `Pontuação: ${this.score}`;
     }
 }
 
