@@ -64,20 +64,32 @@ class Snake {
 
     mov(){
         document.addEventListener("keydown", (target) => {
-            if(target.key.indexOf("Arrow") !== 0){
+            let targetVerify = target.key;
+
+            if(targetVerify === "w"){
+                targetVerify = "ArrowUp";
+            } else if(targetVerify === "a"){
+                targetVerify = "ArrowLeft";
+            } else if(targetVerify === "s"){
+                targetVerify = "ArrowDown";
+            } else if(targetVerify === "d"){
+                targetVerify = "ArrowRight";
+            }
+
+            if(targetVerify.indexOf("Arrow") !== 0){
                 return;
             }
 
-            if(target.key === this.keySwitch){
+            if(targetVerify === this.keySwitch){
                 return;
             }
 
             if(this.firstTime === false){
                 if(
-                    (target.key === "ArrowRight" && this.keySwitch === "ArrowLeft") ||
-                    (target.key === "ArrowUp" && this.keySwitch === "ArrowDown") ||
-                    (target.key === "ArrowDown" && this.keySwitch === "ArrowUp") ||
-                    (target.key === "ArrowLeft" && this.keySwitch === "ArrowRight")
+                    (targetVerify === "ArrowRight" && this.keySwitch === "ArrowLeft") ||
+                    (targetVerify === "ArrowUp" && this.keySwitch === "ArrowDown") ||
+                    (targetVerify === "ArrowDown" && this.keySwitch === "ArrowUp") ||
+                    (targetVerify === "ArrowLeft" && this.keySwitch === "ArrowRight")
                 ){
                     return;
                 }
@@ -87,7 +99,7 @@ class Snake {
             }
 
             clearInterval(this.setTimeout);
-            this.keySwitch = target.key;
+            this.keySwitch = targetVerify;
             this.render();
         })
     }
