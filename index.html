@@ -15,6 +15,7 @@
         <main>
             <div class="option">
                 <span id="score">Pontuação: 0</span>
+                <span id="attemps">Tentativas: 0</span>
             </div>
             <div class="boardArea">
                 <div class="board">
@@ -23,12 +24,12 @@
             </div>
             <div class="buttons">
                 <div class="top">
-                    <button id="button-top" onclick="cell.snakeManipulador.movButton(`ArrowUp`)">↑</button>
+                    <button id="button-top" class="arrowButtons" onclick="cell.snakeManipulador.movButton(`ArrowUp`)">↑</button>
                 </div>
                 <div class="bottom">
-                    <button id="button-left" onclick="cell.snakeManipulador.movButton(`ArrowLeft`)">←</button>
-                    <button id="button-bottom" onclick="cell.snakeManipulador.movButton(`ArrowDown`)">↓</button>
-                    <button id="button-right" onclick="cell.snakeManipulador.movButton(`ArrowRight`)">→</button>
+                    <button id="button-left" class="arrowButtons" onclick="cell.snakeManipulador.movButton(`ArrowLeft`)">←</button>
+                    <button id="button-bottom" class="arrowButtons" onclick="cell.snakeManipulador.movButton(`ArrowDown`)">↓</button>
+                    <button id="button-right" class="arrowButtons" onclick="cell.snakeManipulador.movButton(`ArrowRight`)">→</button>
                 </div>
             </div>
         </main>

@@ -23,11 +23,15 @@ class Snake {
         this.line = x;
     }
 
-    velocidade = 220;
+    velocidadeAlternator = 220;
+    velocidade = this.velocidadeAlternator;
     setTimeout = "";
     keySwitch = "ArrowLeft";
     firstTime = true;
     stop = false;
+    menu = '';
+    buttonTryAgain = "";
+    loser = true;
 
     render(){
         cell.render(this.keySwitch, this.stop);
@@ -49,6 +53,7 @@ class Snake {
                 return;
             }
         } else {
+            document.querySelector("#attemps").innerHTML = `Tentativas: ${tryAgain.attemps}`;
             this.firstTime = false;
         }
 
@@ -77,6 +82,7 @@ class Snake {
                     return;
                 }
             } else {
+                document.querySelector("#attemps").innerHTML = `Tentativas: ${tryAgain.attemps}`;
                 this.firstTime = false;
             }
 
@@ -87,16 +93,43 @@ class Snake {
     }
 
     gameOver(){
-        this.stop === false ? alert("Você perdeu!") : null;
-        this.stop = true;
         clearInterval(this.setTimeout); // Há um problema aqui (O algoritmo faz o primeiro cell.render, e antes dele finalizar o cell.render com o timeout, ele chega aqui, aí o clearInterval não funciona.)
+        if(this.stop === false){
+            this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
+            this.menu.classList.add("menu");
+            this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
+            this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
+            this.buttonTryAgain.classList.add("buttonTryAgain");
+            this.buttonTryAgain.innerHTML = "Try Again";
+            this.buttonTryAgain.addEventListener('click', () => {
+                tryAgain.newGame();
+            })
+            document.addEventListener('keydown', function tryAgainF(target) {
+                if((target.key === " ") || (target.key === "Enter")){
+                    document.removeEventListener('keydown', tryAgainF);
+                    tryAgain.newGame();
+                }
+            })
+        }
+        this.stop = true;
         return;
     }
 
     win(){
-        this.stop === false ? alert("Você ganhou!") : null;
-        this.stop = true;
         clearInterval(this.setTimeout);
+        if(this.stop === false){
+            this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
+            this.menu.classList.add("menu");
+            this.menu.appendChild(document.createElement("span")).innerHTML = "Parabéns!<br>Você ganhou!";
+            this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
+            this.buttonTryAgain.classList.add("buttonTryAgain");
+            this.buttonTryAgain.innerHTML = "Try Again";
+            this.loser = false;
+            this.buttonTryAgain.addEventListener('click', () => {
+                tryAgain.newGame();
+            })
+        }
+        this.stop = true;
         return;
     }
 }
@@ -110,10 +143,8 @@ class Cell {
         new Snake(2, 0)
     ]
 
-    snakeManipulador = new Snake(0,0);
     food = [null, null];
     headSnake = "";
-    stop = false;
     score = new Score(0);
     
     build(){
@@ -124,7 +155,10 @@ class Cell {
 
         this.headSnake = document.querySelector(`#c${this.snake[this.snake.length - 1].column}l${this.snake[this.snake.length - 1].line}`);
         this.foods();
-        this.snakeManipulador.mov();
+        snakeManipulador.mov();
+        if(snakeManipulador.firstTime === false){
+            setTimeout(() => snakeManipulador.render(), 330);
+        }
     }
 
     foods(){
@@ -170,7 +204,7 @@ class Cell {
             }
             this.draw();
         } else {
-            this.snakeManipulador.gameOver();
+            snakeManipulador.gameOver();
         }
     }
 
@@ -181,7 +215,7 @@ class Cell {
 
         if((this.snake.length - 1) === (board.column * board.line)) {
             this.headSnake.classList.remove("food");
-            this.snakeManipulador.win(); 
+            snakeManipulador.win(); 
             return;
         } else if(this.headSnake.classList.contains("food")){
             this.headSnake.classList.remove("food");
@@ -191,7 +225,7 @@ class Cell {
             }
         } else {
             if(this.headSnake.classList.contains("body")){
-                this.snakeManipulador.gameOver();
+                snakeManipulador.gameOver();
                 return;
             }
 
@@ -208,12 +242,58 @@ class Score {
     }
 
     calcularScore(){
-        console.log(this.score)
         this.score += 10;
         document.querySelector("#score").innerHTML = `Pontuação: ${this.score}`;
     }
 }
 
+class TryAgain {
+    constructor(){
+        this.attemps = 1;
+    }
+
+    newGame(){
+        document.querySelectorAll('.snake').forEach(valor => {
+            valor.classList.remove("snake");
+            valor.classList.remove("body");
+        })
+
+        snakeManipulador.buttonTryAgain.classList.remove("buttonTryAgain");
+        snakeManipulador.menu.style.visibility = "hidden";
+        snakeManipulador.menu.style.pointerEvents = "none";
+
+        snakeManipulador.velocidade = snakeManipulador.velocidadeAlternator;
+        snakeManipulador.setTimeout = "";
+        snakeManipulador.keySwitch = "ArrowRight";
+        snakeManipulador.stop = false;
+        snakeManipulador.menu = '';
+        snakeManipulador.buttonTryAgain = '';
+        cell.snake = [
+            new Snake(0, 0),
+            new Snake(1, 0),
+            new Snake(2, 0)
+        ] 
+        cell.food = [null, null];
+        cell.headSnake = '';
+        cell.score.score = 0;
+        document.querySelector("#score").innerHTML = `Pontuação: ${cell.score.score}`;
+
+        if(snakeManipulador.loser === true){
+            document.querySelector('.food').classList.remove('food');
+            this.attemps++;
+        } else {
+            snakeManipulador.loser = true;
+            this.attemps = 1;
+        }
+
+        document.querySelector("#attemps").innerHTML = `Tentativas: ${tryAgain.attemps}`;
+
+        cell.build();
+    }
+}
+
+const tryAgain = new TryAgain();
+const snakeManipulador = new Snake();
 const board = new Board(10, 10);
 const cell = new Cell();
 
