@@ -37,9 +37,17 @@ main {
 }
 
 .snake {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.body{
     background-color: #8e0eff;
-    width: 93%;
-    height: 93%;
+}
+
+.headSnake {
+    background-color: black;
 }
 
 .food {
@@ -106,6 +114,110 @@ main {
 .buttonTryAgain:hover {
     background-color: #8e0eff;
     color: black;
+}
+
+.toUp {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    bottom: 0;
+    background-color: #8e0eff;
+    animation: toUp 0.4s linear;
+}
+
+.toBottom {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    background-color: #8e0eff;
+    animation: toBottom 0.4s linear;
+}
+
+.toLeft {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    right: 0;
+    background-color: #8e0eff;
+    animation: toLeft 0.4s linear;
+}
+
+.toRight {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    background-color: #8e0eff;
+    animation: toRight 0.4s linear;
+}
+
+.toUpTail {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    bottom: 0;
+    background-color: black;
+    animation: toUp 0.4s linear;
+}
+
+.toBottomTail {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    background-color: black;
+    animation: toBottom 0.4s linear;
+}
+
+.toLeftTail {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    right: 0;
+    background-color: black;
+    animation: toLeft 0.4s linear;
+}
+
+.toRightTail {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    background-color: black;
+    animation: toRight 0.4s linear;
+}
+
+@keyframes toUp {
+    from {
+        height: 0;
+    } to {
+        height: 100%;
+    }
+}
+
+@keyframes toBottom {
+    from {
+        height: 0;
+    } to {
+        height: 100%;
+    }
+}
+
+@keyframes toLeft {
+    from {
+        width: 0;
+    } to {
+        width: 100%;
+    }
+}
+
+@keyframes toRight {
+    from {
+        width: 0;
+    } to {
+        width: 100%;
+    }
 }
 
 @media screen and (max-width: 480px){

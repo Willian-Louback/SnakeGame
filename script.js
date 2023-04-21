@@ -1,5 +1,7 @@
 const columnBoard = 5;
 const lineBoard = 5;
+let headSon = '';
+let tailSon = '';
 let attemps = 0;
 
 class Board {
@@ -18,7 +20,7 @@ class Board {
     setIntervalID = null;
     food = [null, null];
     keySwitch = "ArrowLeft";
-    moveSpeed = 220;
+    moveSpeed = 420;
     menu = '';
     buttonTryAgain = "";
     stop = false;
@@ -38,7 +40,7 @@ class Board {
 
         for(let i = 0; i < this.snake.length; i++){
             document.querySelector(`#c${this.snake[i].column}l${this.snake[i].line}`).classList.add('snake');
-            i < (this.snake.length - 1) ? document.querySelector(`#c${this.snake[i].column}l${this.snake[i].line}`).classList.add("body") : null;
+            i < (this.snake.length - 1) ? document.querySelector(`#c${this.snake[i].column}l${this.snake[i].line}`).classList.add("body") : document.querySelector(`#c${this.snake[i].column}l${this.snake[i].line}`).classList.add("headSnake");
         }
 
         this.generateFood();
@@ -56,35 +58,73 @@ class Board {
     }
 
     move(){
+        let directionHead = '';
         switch (this.keySwitch){
             case "ArrowRight":
+                directionHead = "toRight";
                 this.snake.push(new Snake(this.snake[this.snake.length - 1].column + 1, this.snake[this.snake.length - 1].line));
                 if(this.snake[this.snake.length - 1].column === board.column){
                     this.snake[this.snake.length - 1].column = 0;
                 }
                 break;
             case "ArrowUp":
+                directionHead = "toUp";
                 this.snake.push(new Snake(this.snake[this.snake.length - 1].column, this.snake[this.snake.length - 1].line - 1));
                 if(this.snake[this.snake.length - 1].line === -1){
                     this.snake[this.snake.length - 1].line = board.line - 1;
                 }
                 break;
             case "ArrowLeft":
+                directionHead = "toLeft";
                 this.snake.push(new Snake(this.snake[this.snake.length - 1].column - 1, this.snake[this.snake.length - 1].line));
                 if(this.snake[this.snake.length - 1].column === -1){
                     this.snake[this.snake.length - 1].column = board.column - 1;
                 }
                 break;
             case "ArrowDown":
+                directionHead = "toBottom";
                 this.snake.push(new Snake(this.snake[this.snake.length - 1].column, this.snake[this.snake.length - 1].line + 1));
                 if(this.snake[this.snake.length - 1].line === board.line){
                     this.snake[this.snake.length - 1].line = 0;
                 }
                 break;
         }
+
+        let directionTail = '';
+        let numberC = 1;
+        let numberL = 1;
+
+        ((this.snake[1].column - this.snake[2].column) !== 1) && ((this.snake[1].column - this.snake[2].column) !== -1) ? numberC = this.column - 1 : null;
+        ((this.snake[1].line - this.snake[2].line) !== 1) && ((this.snake[1].line - this.snake[2].line) !== -1) ? numberL = this.line - 1 : null;
+
+        if(this.snake[1].column + numberC === this.snake[2].column){
+            if(numberC > 1){
+                directionTail = 'toLeftTail';
+            } else {
+                directionTail = 'toRightTail';
+            }
+        } else if(this.snake[1].column - numberC === this.snake[2].column){
+            if(numberC > 1){
+                directionTail = 'toRightTail';
+            } else {
+                directionTail = 'toLeftTail';
+            }
+        } else if(this.snake[1].line + numberL === this.snake[2].line){
+            if(numberL > 1){
+                directionTail = 'toUpTail';
+            } else {
+                directionTail = 'toBottomTail';
+            }
+        } else if(this.snake[1].line - numberL === this.snake[2].line){
+            if(numberL > 1){
+                directionTail = 'toBottomTail';
+            } else {
+                directionTail = 'toUpTail';
+            }
+        }
         
         const cell = new Cell(this.snake[this.snake.length - 1].column, this.snake[this.snake.length - 1].line, "snake");
-        cell.draw();
+        cell.draw(directionHead, directionTail);
     }
 
     verifyMove(square){
@@ -300,13 +340,28 @@ class Cell {
         this.type = type;
     }
 
-    draw(){
+    draw(directionHead, directionTail){
         const square = document.querySelector(`#c${this.column}l${this.line}`);
         if(this.type === "food"){
             square.classList.add('food');
         } else {
-            document.querySelector(`#c${board.snake[board.snake.length - 2].column}l${board.snake[board.snake.length - 2].line}`).classList.add('body');
-            square.classList.add('snake');
+            console.log(directionTail)
+            if(headSon){
+                headSon.remove();
+            }
+
+            if(tailSon){
+                tailSon.remove();
+            }
+            
+            tailSon = document.querySelector(`#c${board.snake[1].column}l${board.snake[1].line}`).appendChild(document.createElement('div'));
+            tailSon.classList.add(directionTail);
+            const previousHead = document.querySelector(`#c${board.snake[board.snake.length - 2].column}l${board.snake[board.snake.length - 2].line}`);
+            previousHead.classList.add('body');
+            previousHead.classList.remove('headSnake');
+            square.classList.add('snake', 'headSnake');
+            headSon = square.appendChild(document.createElement('div'));
+            headSon.classList.add(directionHead);
             board.verifyMove(square);
         }
     }
