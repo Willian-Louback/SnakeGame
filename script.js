@@ -1,5 +1,6 @@
-const columnBoard = 5;
-const lineBoard = 5;
+const columnBoard = 10;
+const lineBoard = 10;
+let positionBefore = '';
 let headSon = '';
 let tailSon = '';
 let attemps = 0;
@@ -20,7 +21,7 @@ class Board {
     setIntervalID = null;
     food = [null, null];
     keySwitch = "ArrowLeft";
-    moveSpeed = 420;
+    moveSpeed = 220;
     menu = '';
     buttonTryAgain = "";
     stop = false;
@@ -40,7 +41,7 @@ class Board {
 
         for(let i = 0; i < this.snake.length; i++){
             document.querySelector(`#c${this.snake[i].column}l${this.snake[i].line}`).classList.add('snake');
-            i < (this.snake.length - 1) ? document.querySelector(`#c${this.snake[i].column}l${this.snake[i].line}`).classList.add("body") : document.querySelector(`#c${this.snake[i].column}l${this.snake[i].line}`).classList.add("headSnake");
+            i < (this.snake.length - 1) ? document.querySelector(`#c${this.snake[i].column}l${this.snake[i].line}`).classList.add("body") : null;
         }
 
         this.generateFood();
@@ -94,28 +95,28 @@ class Board {
         let numberC = 1;
         let numberL = 1;
 
-        ((this.snake[1].column - this.snake[2].column) !== 1) && ((this.snake[1].column - this.snake[2].column) !== -1) ? numberC = this.column - 1 : null;
-        ((this.snake[1].line - this.snake[2].line) !== 1) && ((this.snake[1].line - this.snake[2].line) !== -1) ? numberL = this.line - 1 : null;
+        ((this.snake[0].column - this.snake[1].column) !== 1) && ((this.snake[0].column - this.snake[1].column) !== -1) ? numberC = this.column - 1 : null;
+        ((this.snake[0].line - this.snake[1].line) !== 1) && ((this.snake[0].line - this.snake[1].line) !== -1) ? numberL = this.line - 1 : null;
 
-        if(this.snake[1].column + numberC === this.snake[2].column){
+        if(this.snake[0].column + numberC === this.snake[1].column){
             if(numberC > 1){
                 directionTail = 'toLeftTail';
             } else {
                 directionTail = 'toRightTail';
             }
-        } else if(this.snake[1].column - numberC === this.snake[2].column){
+        } else if(this.snake[0].column - numberC === this.snake[1].column){
             if(numberC > 1){
                 directionTail = 'toRightTail';
             } else {
                 directionTail = 'toLeftTail';
             }
-        } else if(this.snake[1].line + numberL === this.snake[2].line){
+        } else if(this.snake[0].line + numberL === this.snake[1].line){
             if(numberL > 1){
                 directionTail = 'toUpTail';
             } else {
                 directionTail = 'toBottomTail';
             }
-        } else if(this.snake[1].line - numberL === this.snake[2].line){
+        } else if(this.snake[0].line - numberL === this.snake[1].line){
             if(numberL > 1){
                 directionTail = 'toBottomTail';
             } else {
@@ -168,6 +169,10 @@ class Board {
     gameOver(){
         this.stop = true;
         clearInterval(this.setIntervalID);
+        
+        positionBefore = '';
+        headSon = '';
+        tailSon = '';
         
         this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
         this.menu.classList.add("menu");
@@ -223,6 +228,10 @@ class Board {
     win(){
         this.stop = true;
         clearInterval(this.setIntervalID);
+
+        positionBefore = '';
+        headSon = '';
+        tailSon = '';
 
         this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
         this.menu.classList.add("menu");
@@ -345,23 +354,34 @@ class Cell {
         if(this.type === "food"){
             square.classList.add('food');
         } else {
-            console.log(directionTail)
             if(headSon){
                 headSon.remove();
             }
 
             if(tailSon){
                 tailSon.remove();
+                if(positionBefore && !square.classList.contains("body")){
+                    positionBefore.classList.remove("snake");
+                }
             }
             
-            tailSon = document.querySelector(`#c${board.snake[1].column}l${board.snake[1].line}`).appendChild(document.createElement('div'));
-            tailSon.classList.add(directionTail);
+            if(!square.classList.contains("food") && !square.classList.contains("body")){
+                tailSon = document.querySelector(`#c${board.snake[0].column}l${board.snake[0].line}`).appendChild(document.createElement('div'));
+                tailSon.classList.add(directionTail);
+            }
+
             const previousHead = document.querySelector(`#c${board.snake[board.snake.length - 2].column}l${board.snake[board.snake.length - 2].line}`);
             previousHead.classList.add('body');
             previousHead.classList.remove('headSnake');
             square.classList.add('snake', 'headSnake');
-            headSon = square.appendChild(document.createElement('div'));
-            headSon.classList.add(directionHead);
+            if(!square.classList.contains("body")){
+                headSon = square.appendChild(document.createElement('div'));
+                headSon.classList.add(directionHead);
+            } else {
+                headSon = square.appendChild(document.createElement('div'));
+                headSon.classList.add("snake");
+            }
+
             board.verifyMove(square);
         }
     }
@@ -369,8 +389,12 @@ class Cell {
     erase(square, removeFood){
         if(removeFood){
             square.classList.remove("food");
+            if(positionBefore){
+                positionBefore.classList.remove("snake");
+            }
         } else {
-            document.querySelector(`#c${board.snake[0].column}l${board.snake[0].line}`).classList.remove('snake', 'body');
+            positionBefore = document.querySelector(`#c${board.snake[0].column}l${board.snake[0].line}`);
+            positionBefore.classList.remove('body');
             board.snake.shift();
         }
     }
