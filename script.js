@@ -1,6 +1,7 @@
-const columnBoard = 5;
-const lineBoard = 5;
+const columnBoard = 10;
+const lineBoard = 10;
 let attemps = 0;
+let maxScore = 0;
 
 class Board {
     constructor(column, line){
@@ -82,7 +83,7 @@ class Board {
                 }
                 break;
         }
-        
+
         const cell = new Cell(this.snake[this.snake.length - 1].column, this.snake[this.snake.length - 1].line, "snake");
         cell.draw();
     }
@@ -115,7 +116,7 @@ class Board {
         this.food[0] = Math.floor(Math.random() * board.line);
         this.food[1] = Math.floor(Math.random() * board.column);
         const foodPosition = document.querySelector(`#c${this.food[1]}l${this.food[0]}`);
-        
+
         if(foodPosition.classList.contains('snake')){
             this.generateFood();
             return;
@@ -128,7 +129,14 @@ class Board {
     gameOver(){
         this.stop = true;
         clearInterval(this.setIntervalID);
-        
+
+        if(maxScore < this.score){
+            maxScore = this.score;
+            document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
+        } else {
+            document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
+        }
+
         this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
         this.menu.classList.add("menu");
         this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
@@ -150,7 +158,6 @@ class Board {
                 board.menu.remove();
 
                 setTimeout(() => {
-
                     board = new Board(columnBoard, lineBoard);
                     board.build();
                 }, 200);
@@ -176,13 +183,20 @@ class Board {
                 board.build();
             }, 200);
         })
-        
+
         return;
     }
 
     win(){
         this.stop = true;
         clearInterval(this.setIntervalID);
+
+        if(maxScore < this.score){
+            maxScore = this.score;
+            document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
+        } else {
+            document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
+        }
 
         this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
         this.menu.classList.add("menu");
@@ -233,7 +247,7 @@ class Snake {
             ){
                 return;
             }
-        } else { 
+        } else {
             attemps++;
             document.querySelector("#attemps").innerHTML = `Tentativas: ${attemps}`;
             this.firstTime = false;
@@ -245,12 +259,12 @@ class Snake {
     }
 
     moveKeydown(){
-        document.addEventListener("keydown", function moveKeydownF(target) {
+        const moveKeydownF = (target) => {
             if(board.stop === true){
                 document.removeEventListener("keydown", moveKeydownF);
                 return;
             }
-            
+
             let targetVerify = target.key;
 
             if(targetVerify === "w"){
@@ -289,7 +303,9 @@ class Snake {
             clearInterval(board.setIntervalID);
             board.keySwitch = targetVerify;
             board.definingMove();
-        }.bind(this));
+        }
+
+        document.addEventListener("keydown", moveKeydownF);
     }
 }
 
@@ -324,3 +340,17 @@ class Cell {
 let board = new Board(columnBoard, lineBoard);
 
 board.build();
+
+const menuClick = () => {
+    const menuItens = document.querySelector("#menuItens");
+
+    menuItens.style.display === "none"
+    ? (
+        (menuItens.style.display = "flex"),
+        (document.querySelector("#menuHamburguerSpan").style.color = "white")
+    )
+    : (
+        (menuItens.style.display = "none"),
+        (document.querySelector("#menuHamburguerSpan").style.color = "black")
+    )
+}
