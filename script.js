@@ -123,7 +123,7 @@ class Board {
                 directionTail = 'toUpTail';
             }
         }
-        
+
         const cell = new Cell(this.snake[this.snake.length - 1].column, this.snake[this.snake.length - 1].line, "snake");
         cell.draw(directionHead, directionTail);
     }
@@ -156,7 +156,7 @@ class Board {
         this.food[0] = Math.floor(Math.random() * board.line);
         this.food[1] = Math.floor(Math.random() * board.column);
         const foodPosition = document.querySelector(`#c${this.food[1]}l${this.food[0]}`);
-        
+
         if(foodPosition.classList.contains('snake')){
             this.generateFood();
             return;
@@ -169,11 +169,11 @@ class Board {
     gameOver(){
         this.stop = true;
         clearInterval(this.setIntervalID);
-        
+
         positionBefore = '';
         headSon = '';
         tailSon = '';
-        
+
         this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
         this.menu.classList.add("menu");
         this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
@@ -221,7 +221,7 @@ class Board {
                 board.build();
             }, 200);
         })
-        
+
         return;
     }
 
@@ -282,7 +282,7 @@ class Snake {
             ){
                 return;
             }
-        } else { 
+        } else {
             attemps++;
             document.querySelector("#attemps").innerHTML = `Tentativas: ${attemps}`;
             this.firstTime = false;
@@ -294,12 +294,12 @@ class Snake {
     }
 
     moveKeydown(){
-        document.addEventListener("keydown", function moveKeydownF(target) {
+        const moveKeydownF = (target) => {
             if(board.stop === true){
                 document.removeEventListener("keydown", moveKeydownF);
                 return;
             }
-            
+
             let targetVerify = target.key;
 
             if(targetVerify === "w"){
@@ -338,7 +338,9 @@ class Snake {
             clearInterval(board.setIntervalID);
             board.keySwitch = targetVerify;
             board.definingMove();
-        }.bind(this));
+        }
+
+        document.addEventListener("keydown", moveKeydownF);
     }
 }
 
@@ -364,7 +366,7 @@ class Cell {
                     positionBefore.classList.remove("snake");
                 }
             }
-            
+
             if(!square.classList.contains("food") && !square.classList.contains("body")){
                 tailSon = document.querySelector(`#c${board.snake[0].column}l${board.snake[0].line}`).appendChild(document.createElement('div'));
                 tailSon.classList.add(directionTail);
