@@ -1,3 +1,9 @@
+body {
+    background-image: url("/images/backgroundChespin.webp");
+    background-position: bottom;
+    background-size: cover;
+}
+
 main {
     width: 100vw;
     height: 100vh;
@@ -20,7 +26,7 @@ nav {
 }
 
 .areaRanking {
-    width: 50%;
+    width: 40%;
     height: 80%;
     border-radius: 4px;
 }
@@ -46,14 +52,6 @@ ul {
     border-radius: 4px;
 }
 
-.black {
-    background-color: rgb(25, 25, 25);
-}
-
-.gray {
-    background-color: rgb(14, 14, 14);
-}
-
 .fixListFirst {
     margin-top: 10px;
 }
@@ -63,7 +61,7 @@ ul {
 }
 
 span {
-    font-family: 'Press Start 2P', cursive;
+    font-family: 'Press Start 2P', Arial, sans-serif;
     color: #8e0eff;
     margin: 0 15px;
 }
@@ -72,6 +70,7 @@ span {
     cursor: pointer;
     margin: 15px;
     color: black;
+    font-size: 40px;
 }
 
 #menuItens {
@@ -89,12 +88,13 @@ span {
 .liSpan {
     display: flex;
     align-items: center;
-    margin-top: 50px;
+    justify-content: center;
+    margin-top: 60px;
     list-style: none;
     color: #8e0eff;
     width: 100%;
     height: 40px;
-    font-family: 'Press Start 2P', cursive;
+    font-family: 'Press Start 2P', Arial, sans-serif;
 }
 
 .spanPlay {
@@ -115,4 +115,80 @@ span {
 
 .third {
     color: burlywood;
+}
+
+.infoRanking {
+    font-size: 17px;
+}
+
+@media screen and (max-width: 480px){
+    body {
+        background-image: none;
+        background-color: #0b9444;
+    }
+
+    .areaRanking {
+        width: 85%;
+    }
+
+    #menuHamburguerSpan {
+       font-size: 40px;
+    }
+
+    .infoRanking {
+        font-size: 8px;
+    }
+}
+
+@media screen and (min-width: 481px) and (max-width: 768px){
+    body {
+        background-image: none;
+        background-color: #0b9444;
+    }
+
+    .areaRanking {
+        width: 87%;
+    }
+
+    #menuHamburguerSpan {
+       font-size: 40px;
+    }
+
+    .infoRanking {
+        font-size: 14px;
+    }
+}
+
+@media screen and (min-width: 769px) and (max-width: 1024px){
+    body {
+        background-image: none;
+        background-color: #0b9444;
+    }
+
+    .areaRanking {
+        width: 70%;
+    }
+
+    #menuHamburguerSpan {
+       font-size: 40px;
+    }
+
+    .infoRanking {
+        font-size: 14px;
+    }
+}
+
+@media screen and (min-width: 1025px) and (max-width: 1200px){
+    body {
+        background-image: none;
+        background-color: #0b9444;
+    }
+
+    #menuHamburguerSpan {
+        font-size: 40px;
+    }
+
+    .infoRanking {
+        font-size: 15px;
+    }
 }

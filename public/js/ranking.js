@@ -1,8 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
     const reponse = await fetch("/getData");
     const data = await reponse.json();
-    console.log(data.listRanking);
-
     const rankingUl =  document.querySelector(".rankingUl");
 
     const renderList = () => {

@@ -1,3 +1,9 @@
+body {
+    background-image: url("/images/backgroundChespin.webp");
+    background-position: bottom;
+    background-size: cover;
+}
+
 main {
     width: 100vw;
     height: 100vh;
@@ -42,7 +48,7 @@ main {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-family: 'Press Start 2P', cursive;
+    font-family: 'Press Start 2P', Arial, sans-serif;
 }
 
 #score {
@@ -63,7 +69,7 @@ main {
 }
 
 .menu {
-    font-family: 'Press Start 2P', cursive;
+    font-family: 'Press Start 2P', Arial, sans-serif;
     background-color: #000000;
     position: fixed;
     border-radius: 4px;
@@ -80,7 +86,7 @@ main {
 }
 
 .buttonTryAgain {
-    font-family: 'Press Start 2P', cursive;
+    font-family: 'Press Start 2P', Arial, sans-serif;
     cursor: pointer;
     font-size: 14px;
     background-color: black;
@@ -103,6 +109,7 @@ main {
     margin: 15px;
     position: relative;
     z-index: 2;
+    font-size: 40px;
 }
 
 #menuItens {
@@ -115,25 +122,22 @@ main {
     z-index: 1;
     border-left: 0.5px solid #8e0eff;
     border-bottom: 0.5px solid #8e0eff;
+    padding-top: 60px;
 }
 
 li {
     display: flex;
+    justify-content: center;
     align-items: center;
-    margin-top: 50px;
     list-style: none;
     color: #8e0eff;
     width: 100%;
     height: 40px;
-    font-family: 'Press Start 2P', cursive;
+    font-family: 'Press Start 2P', Arial, sans-serif;
 }
 
 .liSpan {
     margin-left: 15px;
-}
-
-#ranking {
-    cursor: pointer;
 }
 
 .inputName {
@@ -189,6 +193,7 @@ form {
     #attemps {
         margin-right: 0;
         font-size: 20px;
+        display: none;
     }
 
     .buttons {
@@ -253,6 +258,7 @@ form {
 
     #attemps {
         margin-right: 0;
+        display: none;
     }
 
     .buttons {
@@ -311,6 +317,7 @@ form {
 
     #attemps {
         margin-right: 0;
+        display: none;
     }
 
     .buttons {

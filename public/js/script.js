@@ -151,13 +151,14 @@ class Board {
         }
 
         if(maxScore < this.score){
-            alert("Falta resolver algumas coisas ainda, caso não queira salvar o seu score, é só não inserir um nome e pressionar o botão!");
             maxScore = this.score;
             document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
             this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
             this.menu.classList.add("menu");
             this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
-            this.menu.appendChild(document.createElement("span")).innerHTML = "Salve o seu score!";
+            const spanScore = this.menu.appendChild(document.createElement("span"));
+            spanScore.innerHTML = "Salve o seu score!";
+            spanScore.style.fontSize = "16px";
             const form = this.menu.appendChild(document.createElement("form"));
             form.action = "/saveScore";
             form.method = "POST";
@@ -175,6 +176,10 @@ class Board {
             this.buttonTryAgain.value = "Salvar";
             this.buttonTryAgain.name = "submitRanking";
             this.buttonTryAgain.classList.add("buttonTryAgain");
+            this.buttonTryAgain.addEventListener("click", () => {
+                this.buttonTryAgain.disabled = true;
+                form.submit();
+            });
         } else {
             document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
             this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
