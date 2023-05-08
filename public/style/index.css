@@ -1,0 +1,10 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    background-image: url("/images/backgroundChespin.webp");
+    background-position: bottom;
+    background-size: cover;
+}

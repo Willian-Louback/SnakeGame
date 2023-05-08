@@ -14,13 +14,13 @@ class Board {
         new Snake(0, 0),
         new Snake(1, 0),
         new Snake(2, 0)
-    ]
+    ];
 
     setIntervalID = null;
     food = [null, null];
     keySwitch = "ArrowLeft";
     moveSpeed = 220;
-    menu = '';
+    menu = "";
     buttonTryAgain = "";
     stop = false;
     score = 0;
@@ -38,7 +38,7 @@ class Board {
         }
 
         for(let i = 0; i < this.snake.length; i++){
-            document.querySelector(`#c${this.snake[i].column}l${this.snake[i].line}`).classList.add('snake');
+            document.querySelector(`#c${this.snake[i].column}l${this.snake[i].line}`).classList.add("snake");
             i < (this.snake.length - 1) ? document.querySelector(`#c${this.snake[i].column}l${this.snake[i].line}`).classList.add("body") : null;
         }
 
@@ -58,30 +58,30 @@ class Board {
 
     move(){
         switch (this.keySwitch){
-            case "ArrowRight":
-                this.snake.push(new Snake(this.snake[this.snake.length - 1].column + 1, this.snake[this.snake.length - 1].line));
-                if(this.snake[this.snake.length - 1].column === board.column){
-                    this.snake[this.snake.length - 1].column = 0;
-                }
-                break;
-            case "ArrowUp":
-                this.snake.push(new Snake(this.snake[this.snake.length - 1].column, this.snake[this.snake.length - 1].line - 1));
-                if(this.snake[this.snake.length - 1].line === -1){
-                    this.snake[this.snake.length - 1].line = board.line - 1;
-                }
-                break;
-            case "ArrowLeft":
-                this.snake.push(new Snake(this.snake[this.snake.length - 1].column - 1, this.snake[this.snake.length - 1].line));
-                if(this.snake[this.snake.length - 1].column === -1){
-                    this.snake[this.snake.length - 1].column = board.column - 1;
-                }
-                break;
-            case "ArrowDown":
-                this.snake.push(new Snake(this.snake[this.snake.length - 1].column, this.snake[this.snake.length - 1].line + 1));
-                if(this.snake[this.snake.length - 1].line === board.line){
-                    this.snake[this.snake.length - 1].line = 0;
-                }
-                break;
+        case "ArrowRight":
+            this.snake.push(new Snake(this.snake[this.snake.length - 1].column + 1, this.snake[this.snake.length - 1].line));
+            if(this.snake[this.snake.length - 1].column === board.column){
+                this.snake[this.snake.length - 1].column = 0;
+            }
+            break;
+        case "ArrowUp":
+            this.snake.push(new Snake(this.snake[this.snake.length - 1].column, this.snake[this.snake.length - 1].line - 1));
+            if(this.snake[this.snake.length - 1].line === -1){
+                this.snake[this.snake.length - 1].line = board.line - 1;
+            }
+            break;
+        case "ArrowLeft":
+            this.snake.push(new Snake(this.snake[this.snake.length - 1].column - 1, this.snake[this.snake.length - 1].line));
+            if(this.snake[this.snake.length - 1].column === -1){
+                this.snake[this.snake.length - 1].column = board.column - 1;
+            }
+            break;
+        case "ArrowDown":
+            this.snake.push(new Snake(this.snake[this.snake.length - 1].column, this.snake[this.snake.length - 1].line + 1));
+            if(this.snake[this.snake.length - 1].line === board.line){
+                this.snake[this.snake.length - 1].line = 0;
+            }
+            break;
         }
 
         const cell = new Cell(this.snake[this.snake.length - 1].column, this.snake[this.snake.length - 1].line, "snake");
@@ -117,7 +117,7 @@ class Board {
         this.food[1] = Math.floor(Math.random() * board.column);
         const foodPosition = document.querySelector(`#c${this.food[1]}l${this.food[0]}`);
 
-        if(foodPosition.classList.contains('snake')){
+        if(foodPosition.classList.contains("snake")){
             this.generateFood();
             return;
         }
@@ -131,29 +131,50 @@ class Board {
         clearInterval(this.setIntervalID);
 
         if(maxScore < this.score){
+            alert("Falta resolver algumas coisas ainda, caso não queira salvar o seu score, é só não inserir um nome e pressionar o botão!");
             maxScore = this.score;
             document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
+            this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
+            this.menu.classList.add("menu");
+            this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
+            this.menu.appendChild(document.createElement("span")).innerHTML = "Salve o seu score!";
+            const form = this.menu.appendChild(document.createElement("form"));
+            form.action = "/saveScore";
+            form.method = "POST";
+            const inputScore = form.appendChild(document.createElement("input"));
+            inputScore.name = "score";
+            inputScore.value = maxScore;
+            inputScore.style.display = "none";
+            const inputName = form.appendChild(document.createElement("input"));
+            inputName.type = "text";
+            inputName.placeholder = "Digite o seu nome...";
+            inputName.name = "userName";
+            inputName.classList.add("inputName");
+            this.buttonTryAgain = form.appendChild(document.createElement("input"));
+            this.buttonTryAgain.type = "submit";
+            this.buttonTryAgain.value = "Salvar";
+            this.buttonTryAgain.name = "submitRanking";
+            this.buttonTryAgain.classList.add("buttonTryAgain");
         } else {
             document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
+            this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
+            this.menu.classList.add("menu");
+            this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
+            this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
+            this.buttonTryAgain.classList.add("buttonTryAgain");
+            this.buttonTryAgain.innerHTML = "Try Again";
         }
 
-        this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
-        this.menu.classList.add("menu");
-        this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
-        this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
-        this.buttonTryAgain.classList.add("buttonTryAgain");
-        this.buttonTryAgain.innerHTML = "Try Again";
-
-        function tryAgainF(target){
+        /*function tryAgainF(target){
             if((target.key === " ") || (target.key === "Enter")){
-                document.removeEventListener('keydown', tryAgainF);
+                document.removeEventListener("keydown", tryAgainF);
                 document.querySelector("#score").innerHTML = `Pontuação: 0`;
-                const food = document.querySelector('.food');
-                food ? food.classList.remove('food') : null;
+                const food = document.querySelector(".food");
+                food ? food.classList.remove("food") : null;
 
-                document.querySelectorAll('.square').forEach(value => {
+                document.querySelectorAll(".square").forEach(value => {
                     value.remove();
-                })
+                });
 
                 board.menu.remove();
 
@@ -164,17 +185,17 @@ class Board {
             }
         }
 
-        document.addEventListener('keydown', tryAgainF);
+        document.addEventListener("keydown", tryAgainF);
 
-        this.buttonTryAgain.addEventListener('click', () => {
-            document.removeEventListener('keydown', tryAgainF);
+        this.buttonTryAgain.addEventListener("click", () => {
+            document.removeEventListener("keydown", tryAgainF);
             document.querySelector("#score").innerHTML = `Pontuação: 0`;
-            const food = document.querySelector('.food');
-            food ? food.classList.remove('food') : null;
+            const food = document.querySelector(".food");
+            food ? food.classList.remove("food") : null;
 
-            document.querySelectorAll('.square').forEach(value => {
+            document.querySelectorAll(".square").forEach(value => {
                 value.remove();
-            })
+            });
 
             this.menu.remove();
 
@@ -182,9 +203,9 @@ class Board {
                 board = new Board(columnBoard, lineBoard);
                 board.build();
             }, 200);
-        })
+        });
 
-        return;
+        return;*/
     }
 
     win(){
@@ -204,12 +225,12 @@ class Board {
         this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
         this.buttonTryAgain.classList.add("buttonTryAgain");
         this.buttonTryAgain.innerHTML = "Try Again";
-        this.buttonTryAgain.addEventListener('click', () => {
+        this.buttonTryAgain.addEventListener("click", () => {
             document.querySelector("#score").innerHTML = `Pontuação: 0`;
 
-            document.querySelectorAll('.square').forEach(value => {
+            document.querySelectorAll(".square").forEach(value => {
                 value.remove();
-            })
+            });
 
             this.menu.remove();
             attemps = 0;
@@ -219,7 +240,7 @@ class Board {
                 board = new Board(columnBoard, lineBoard);
                 board.build();
             }, 200);
-        })
+        });
 
         return;
     }
@@ -303,7 +324,7 @@ class Snake {
             clearInterval(board.setIntervalID);
             board.keySwitch = targetVerify;
             board.definingMove();
-        }
+        };
 
         document.addEventListener("keydown", moveKeydownF);
     }
@@ -319,10 +340,10 @@ class Cell {
     draw(){
         const square = document.querySelector(`#c${this.column}l${this.line}`);
         if(this.type === "food"){
-            square.classList.add('food');
+            square.classList.add("food");
         } else {
-            document.querySelector(`#c${board.snake[board.snake.length - 2].column}l${board.snake[board.snake.length - 2].line}`).classList.add('body');
-            square.classList.add('snake');
+            document.querySelector(`#c${board.snake[board.snake.length - 2].column}l${board.snake[board.snake.length - 2].line}`).classList.add("body");
+            square.classList.add("snake");
             board.verifyMove(square);
         }
     }
@@ -331,7 +352,7 @@ class Cell {
         if(removeFood){
             square.classList.remove("food");
         } else {
-            document.querySelector(`#c${board.snake[0].column}l${board.snake[0].line}`).classList.remove('snake', 'body');
+            document.querySelector(`#c${board.snake[0].column}l${board.snake[0].line}`).classList.remove("snake", "body");
             board.snake.shift();
         }
     }
@@ -345,12 +366,12 @@ const menuClick = () => {
     const menuItens = document.querySelector("#menuItens");
 
     menuItens.style.display === "none"
-    ? (
-        (menuItens.style.display = "flex"),
-        (document.querySelector("#menuHamburguerSpan").style.color = "white")
-    )
-    : (
-        (menuItens.style.display = "none"),
-        (document.querySelector("#menuHamburguerSpan").style.color = "black")
-    )
-}
+        ? (
+            (menuItens.style.display = "flex"),
+            (document.querySelector("#menuHamburguerSpan").style.color = "#8e0eff")
+        )
+        : (
+            (menuItens.style.display = "none"),
+            (document.querySelector("#menuHamburguerSpan").style.color = "black")
+        );
+};

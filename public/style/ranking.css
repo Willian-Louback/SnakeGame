@@ -1,0 +1,118 @@
+main {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+}
+
+nav {
+    position: fixed;
+    right: 0;
+    z-index: 2;
+}
+
+.title {
+    color: black;
+    font-size: 25px;
+}
+
+.areaRanking {
+    width: 50%;
+    height: 80%;
+    border-radius: 4px;
+}
+
+ul {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 4px;
+    background-color: black;
+    gap: 10px;
+}
+
+.list {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 95%;
+    height: 95%;
+    list-style: none;
+    border-radius: 4px;
+}
+
+.black {
+    background-color: rgb(25, 25, 25);
+}
+
+.gray {
+    background-color: rgb(14, 14, 14);
+}
+
+.fixListFirst {
+    margin-top: 10px;
+}
+
+.fixListLast {
+    margin-bottom: 10px;
+}
+
+span {
+    font-family: 'Press Start 2P', cursive;
+    color: #8e0eff;
+    margin: 0 15px;
+}
+
+#menuHamburguerSpan {
+    cursor: pointer;
+    margin: 15px;
+    color: black;
+}
+
+#menuItens {
+    position: fixed;
+    right: 0;
+    background-color: #000000;
+    width: 300px;
+    height: 400px;
+    flex-direction: column;
+    z-index: 1;
+    border-left: 0.5px solid #8e0eff;
+    border-bottom: 0.5px solid #8e0eff;
+}
+
+.liSpan {
+    display: flex;
+    align-items: center;
+    margin-top: 50px;
+    list-style: none;
+    color: #8e0eff;
+    width: 100%;
+    height: 40px;
+    font-family: 'Press Start 2P', cursive;
+}
+
+.spanPlay {
+    margin-left: 15px;
+}
+
+#play {
+    cursor: pointer;
+}
+
+.first {
+    color: yellow;
+}
+
+.second {
+    color: gray;
+}
+
+.third {
+    color: burlywood;
+}
