@@ -18,8 +18,7 @@
     "dotenv": "^16.0.3",
     "eslint": "^8.40.0"
   },
-  "homepage": "https://Willian-Louback.github.io/SnakeGame/",
-  "directories": {
-    "public": "public"
+  "engines": {
+    "node": "19.9.0"
   }
 }
