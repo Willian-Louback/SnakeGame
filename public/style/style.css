@@ -165,6 +165,17 @@ form {
     gap: 20px;
 }
 
+#aMenu {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+#spanA {
+    font-family: 'Press Start 2P', Arial, sans-serif;
+    cursor: pointer;
+}
+
 @media screen and (max-width: 480px){
     body {
         background-image: none;

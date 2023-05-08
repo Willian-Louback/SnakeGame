@@ -150,66 +150,132 @@ class Board {
             }
         }
 
-        if(maxScore < this.score){
-            maxScore = this.score;
-            document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
-            this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
-            this.menu.classList.add("menu");
-            this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
-            const spanScore = this.menu.appendChild(document.createElement("span"));
-            spanScore.innerHTML = "Salve o seu score!";
-            spanScore.style.fontSize = "16px";
-            const form = this.menu.appendChild(document.createElement("form"));
-            form.action = "/saveScore";
-            form.method = "POST";
-            const inputScore = form.appendChild(document.createElement("input"));
-            inputScore.name = "score";
-            inputScore.value = maxScore;
-            inputScore.style.display = "none";
-            const inputName = form.appendChild(document.createElement("input"));
-            inputName.type = "text";
-            inputName.placeholder = "Digite o seu nome...";
-            inputName.name = "userName";
-            inputName.classList.add("inputName");
-            this.buttonTryAgain = form.appendChild(document.createElement("input"));
-            this.buttonTryAgain.type = "submit";
-            this.buttonTryAgain.value = "Salvar";
-            this.buttonTryAgain.name = "submitRanking";
-            this.buttonTryAgain.classList.add("buttonTryAgain");
-            this.buttonTryAgain.addEventListener("click", () => {
-                this.buttonTryAgain.disabled = true;
-                form.submit();
-            });
-        } else {
-            document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
-            this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
-            this.menu.classList.add("menu");
-            this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
-            this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
-            this.buttonTryAgain.classList.add("buttonTryAgain");
-            this.buttonTryAgain.innerHTML = "Try Again";
+        const verifyDB = async () => {
+            const reponse = await fetch("/getData");
+            const data = await reponse.json();
 
-            document.addEventListener("keydown", tryAgainF);
+            if(!data.listRanking[9]){
+                return true;
+            }
 
-            this.buttonTryAgain.addEventListener("click", () => {
-                document.removeEventListener("keydown", tryAgainF);
-                document.querySelector("#score").innerHTML = `Pontuação: 0`;
-                const food = document.querySelector(".food");
-                food ? food.classList.remove("food") : null;
+            if(data.listRanking[9].score < this.score){
+                return true;
+            } else {
+                return false;
+            }
+        };
 
-                document.querySelectorAll(".square").forEach(value => {
-                    value.remove();
+        const waitVerify = async() => {
+            const result = await verifyDB();
+
+            if(
+                (maxScore < this.score) &&
+                (result === true)
+            ){
+                maxScore = this.score;
+                document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
+                this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
+                this.menu.classList.add("menu");
+                const a = this.menu.appendChild(document.createElement("a"));
+                a.id = "aMenu";
+                const spanA = a.appendChild(document.createElement("span"));
+                spanA.innerHTML = "X";
+                spanA.id = "spanA";
+
+                a.addEventListener("click", () => {
+                    document.removeEventListener("keydown", tryAgainF);
+                    document.querySelector("#score").innerHTML = `Pontuação: 0`;
+                    const food = document.querySelector(".food");
+                    food ? food.classList.remove("food") : null;
+
+                    document.querySelectorAll(".square").forEach(value => {
+                        value.remove();
+                    });
+
+                    this.menu.remove();
+
+                    setTimeout(() => {
+                        board = new Board(columnBoard, lineBoard);
+                        board.build();
+                    }, 200);
                 });
 
-                this.menu.remove();
+                this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
+                const spanScore = this.menu.appendChild(document.createElement("span"));
+                spanScore.innerHTML = "Salve o seu score!";
+                spanScore.style.fontSize = "16px";
 
-                setTimeout(() => {
-                    board = new Board(columnBoard, lineBoard);
-                    board.build();
-                }, 200);
-            });
-        }
-        return;
+                const form = this.menu.appendChild(document.createElement("form"));
+                form.action = "/saveScore";
+                form.method = "POST";
+
+                const inputScore = form.appendChild(document.createElement("input"));
+                inputScore.name = "score";
+                inputScore.value = maxScore;
+                inputScore.style.display = "none";
+
+                const inputName = form.appendChild(document.createElement("input"));
+                inputName.type = "text";
+                inputName.placeholder = "Digite o seu nome...";
+                inputName.name = "userName";
+                inputName.classList.add("inputName");
+
+                inputName.addEventListener("input", () => {
+                    const inputToString = inputName.value.toString();
+                    if(inputToString.length >= 3 && inputToString.length <= 10){
+                        this.buttonTryAgain.disabled = false;
+                        this.buttonTryAgain.style.backgroundColor = "#8e0eff";
+                        this.buttonTryAgain.style.color = "white";
+                    } else {
+                        this.buttonTryAgain.disabled = true;
+                        this.buttonTryAgain.style.backgroundColor = "black";
+                        this.buttonTryAgain.style.color = "#8e0eff";
+                    }
+                });
+
+                this.buttonTryAgain = form.appendChild(document.createElement("input"));
+                this.buttonTryAgain.type = "submit";
+                this.buttonTryAgain.value = "Salvar";
+                this.buttonTryAgain.name = "submitRanking";
+                this.buttonTryAgain.classList.add("buttonTryAgain");
+                this.buttonTryAgain.addEventListener("click", () => {
+                    this.buttonTryAgain.disabled = true;
+                    this.buttonTryAgain.style.backgroundColor = "black";
+                    this.buttonTryAgain.style.color = "#8e0eff";
+                    form.submit();
+                });
+            } else {
+                document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
+                this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
+                this.menu.classList.add("menu");
+                this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
+                this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
+                this.buttonTryAgain.classList.add("buttonTryAgain");
+                this.buttonTryAgain.innerHTML = "Try Again";
+
+                document.addEventListener("keydown", tryAgainF);
+
+                this.buttonTryAgain.addEventListener("click", () => {
+                    document.removeEventListener("keydown", tryAgainF);
+                    document.querySelector("#score").innerHTML = `Pontuação: 0`;
+                    const food = document.querySelector(".food");
+                    food ? food.classList.remove("food") : null;
+
+                    document.querySelectorAll(".square").forEach(value => {
+                        value.remove();
+                    });
+
+                    this.menu.remove();
+
+                    setTimeout(() => {
+                        board = new Board(columnBoard, lineBoard);
+                        board.build();
+                    }, 200);
+                });
+            }
+        };
+
+        waitVerify();
     }
 
     win(){
@@ -217,30 +283,60 @@ class Board {
         clearInterval(this.setIntervalID);
 
         if(maxScore < this.score){
-            alert("Falta resolver algumas coisas ainda, caso não queira salvar o seu score, é só não inserir um nome e pressionar o botão!");
             maxScore = this.score;
             document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
             this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
             this.menu.classList.add("menu");
+            const a = this.menu.appendChild(document.createElement("a"));
+            a.id = "aMenu";
+            const spanA = a.appendChild(document.createElement("span"));
+            spanA.innerHTML = "X";
+            spanA.id = "spanA";
+
             this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
-            this.menu.appendChild(document.createElement("span")).innerHTML = "Salve o seu score!";
+            const spanScore = this.menu.appendChild(document.createElement("span"));
+            spanScore.innerHTML = "Salve o seu score!";
+            spanScore.style.fontSize = "16px";
+
             const form = this.menu.appendChild(document.createElement("form"));
             form.action = "/saveScore";
             form.method = "POST";
+
             const inputScore = form.appendChild(document.createElement("input"));
             inputScore.name = "score";
             inputScore.value = maxScore;
             inputScore.style.display = "none";
+
             const inputName = form.appendChild(document.createElement("input"));
             inputName.type = "text";
             inputName.placeholder = "Digite o seu nome...";
             inputName.name = "userName";
             inputName.classList.add("inputName");
+
+            inputName.addEventListener("input", () => {
+                const inputToString = inputName.value.toString();
+                if(inputToString.length >= 3 && inputToString.length <= 10){
+                    this.buttonTryAgain.disabled = false;
+                    this.buttonTryAgain.style.backgroundColor = "#8e0eff";
+                    this.buttonTryAgain.style.color = "white";
+                } else {
+                    this.buttonTryAgain.disabled = true;
+                    this.buttonTryAgain.style.backgroundColor = "black";
+                    this.buttonTryAgain.style.color = "#8e0eff";
+                }
+            });
+
             this.buttonTryAgain = form.appendChild(document.createElement("input"));
             this.buttonTryAgain.type = "submit";
             this.buttonTryAgain.value = "Salvar";
             this.buttonTryAgain.name = "submitRanking";
             this.buttonTryAgain.classList.add("buttonTryAgain");
+            this.buttonTryAgain.addEventListener("click", () => {
+                this.buttonTryAgain.disabled = true;
+                this.buttonTryAgain.style.backgroundColor = "black";
+                this.buttonTryAgain.style.color = "#8e0eff";
+                form.submit();
+            });
         } else {
             document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
             this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
