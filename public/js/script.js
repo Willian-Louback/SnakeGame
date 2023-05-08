@@ -130,6 +130,26 @@ class Board {
         this.stop = true;
         clearInterval(this.setIntervalID);
 
+        function tryAgainF(target){
+            if((target.key === " ") || (target.key === "Enter")){
+                document.removeEventListener("keydown", tryAgainF);
+                document.querySelector("#score").innerHTML = `Pontuação: 0`;
+                const food = document.querySelector(".food");
+                food ? food.classList.remove("food") : null;
+
+                document.querySelectorAll(".square").forEach(value => {
+                    value.remove();
+                });
+
+                board.menu.remove();
+
+                setTimeout(() => {
+                    board = new Board(columnBoard, lineBoard);
+                    board.build();
+                }, 200);
+            }
+        }
+
         if(maxScore < this.score){
             alert("Falta resolver algumas coisas ainda, caso não queira salvar o seu score, é só não inserir um nome e pressionar o botão!");
             maxScore = this.score;
@@ -163,10 +183,10 @@ class Board {
             this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
             this.buttonTryAgain.classList.add("buttonTryAgain");
             this.buttonTryAgain.innerHTML = "Try Again";
-        }
 
-        function tryAgainF(target){
-            if((target.key === " ") || (target.key === "Enter")){
+            document.addEventListener("keydown", tryAgainF);
+
+            this.buttonTryAgain.addEventListener("click", () => {
                 document.removeEventListener("keydown", tryAgainF);
                 document.querySelector("#score").innerHTML = `Pontuação: 0`;
                 const food = document.querySelector(".food");
@@ -176,35 +196,14 @@ class Board {
                     value.remove();
                 });
 
-                board.menu.remove();
+                this.menu.remove();
 
                 setTimeout(() => {
                     board = new Board(columnBoard, lineBoard);
                     board.build();
                 }, 200);
-            }
-        }
-
-        document.addEventListener("keydown", tryAgainF);
-
-        this.buttonTryAgain.addEventListener("click", () => {
-            document.removeEventListener("keydown", tryAgainF);
-            document.querySelector("#score").innerHTML = `Pontuação: 0`;
-            const food = document.querySelector(".food");
-            food ? food.classList.remove("food") : null;
-
-            document.querySelectorAll(".square").forEach(value => {
-                value.remove();
             });
-
-            this.menu.remove();
-
-            setTimeout(() => {
-                board = new Board(columnBoard, lineBoard);
-                board.build();
-            }, 200);
-        });
-
+        }
         return;
     }
 
@@ -245,24 +244,24 @@ class Board {
             this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
             this.buttonTryAgain.classList.add("buttonTryAgain");
             this.buttonTryAgain.innerHTML = "Try Again";
-        }
 
-        this.buttonTryAgain.addEventListener("click", () => {
-            document.querySelector("#score").innerHTML = `Pontuação: 0`;
+            this.buttonTryAgain.addEventListener("click", () => {
+                document.querySelector("#score").innerHTML = `Pontuação: 0`;
 
-            document.querySelectorAll(".square").forEach(value => {
-                value.remove();
+                document.querySelectorAll(".square").forEach(value => {
+                    value.remove();
+                });
+
+                this.menu.remove();
+                attemps = 0;
+                document.querySelector("#attemps").innerHTML = `Tentativas: ${attemps}`;
+
+                setTimeout(() => {
+                    board = new Board(columnBoard, lineBoard);
+                    board.build();
+                }, 200);
             });
-
-            this.menu.remove();
-            attemps = 0;
-            document.querySelector("#attemps").innerHTML = `Tentativas: ${attemps}`;
-
-            setTimeout(() => {
-                board = new Board(columnBoard, lineBoard);
-                board.build();
-            }, 200);
-        });
+        }
 
         return;
     }
