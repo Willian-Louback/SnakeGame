@@ -165,7 +165,7 @@ class Board {
             this.buttonTryAgain.innerHTML = "Try Again";
         }
 
-        /*function tryAgainF(target){
+        function tryAgainF(target){
             if((target.key === " ") || (target.key === "Enter")){
                 document.removeEventListener("keydown", tryAgainF);
                 document.querySelector("#score").innerHTML = `Pontuação: 0`;
@@ -205,7 +205,7 @@ class Board {
             }, 200);
         });
 
-        return;*/
+        return;
     }
 
     win(){
@@ -213,18 +213,40 @@ class Board {
         clearInterval(this.setIntervalID);
 
         if(maxScore < this.score){
+            alert("Falta resolver algumas coisas ainda, caso não queira salvar o seu score, é só não inserir um nome e pressionar o botão!");
             maxScore = this.score;
             document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
+            this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
+            this.menu.classList.add("menu");
+            this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
+            this.menu.appendChild(document.createElement("span")).innerHTML = "Salve o seu score!";
+            const form = this.menu.appendChild(document.createElement("form"));
+            form.action = "/saveScore";
+            form.method = "POST";
+            const inputScore = form.appendChild(document.createElement("input"));
+            inputScore.name = "score";
+            inputScore.value = maxScore;
+            inputScore.style.display = "none";
+            const inputName = form.appendChild(document.createElement("input"));
+            inputName.type = "text";
+            inputName.placeholder = "Digite o seu nome...";
+            inputName.name = "userName";
+            inputName.classList.add("inputName");
+            this.buttonTryAgain = form.appendChild(document.createElement("input"));
+            this.buttonTryAgain.type = "submit";
+            this.buttonTryAgain.value = "Salvar";
+            this.buttonTryAgain.name = "submitRanking";
+            this.buttonTryAgain.classList.add("buttonTryAgain");
         } else {
             document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
+            this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
+            this.menu.classList.add("menu");
+            this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
+            this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
+            this.buttonTryAgain.classList.add("buttonTryAgain");
+            this.buttonTryAgain.innerHTML = "Try Again";
         }
 
-        this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
-        this.menu.classList.add("menu");
-        this.menu.appendChild(document.createElement("span")).innerHTML = "Parabéns!<br>Você ganhou!";
-        this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
-        this.buttonTryAgain.classList.add("buttonTryAgain");
-        this.buttonTryAgain.innerHTML = "Try Again";
         this.buttonTryAgain.addEventListener("click", () => {
             document.querySelector("#score").innerHTML = `Pontuação: 0`;
 
