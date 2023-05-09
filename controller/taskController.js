@@ -20,12 +20,12 @@ const getData = async (req, res) => {
 
 const saveScore = async (req, res) => {
     const dataRanking = req.body;
-    const listDelete = await Ranking.find().sort({ score: -1 }).skip(10);
+    /*const listDelete = await Ranking.find().sort({ score: -1 }).skip(10);
 
     listDelete.forEach(async (element) => {
         await Ranking.deleteOne({ _id: element._id });
         console.log(element.userName, "excluido do top 10");
-    });
+    });*/
 
     if(!dataRanking.userName){
         return res.redirect("/");
