@@ -224,11 +224,30 @@ class Board {
                 inputName.classList.add("inputName");
 
                 inputName.addEventListener("input", () => {
-                    const inputToString = inputName.value.toString();
-                    if(inputToString.length >= 3 && inputToString.length <= 10){
-                        this.buttonTryAgain.disabled = false;
-                        this.buttonTryAgain.style.backgroundColor = "#8e0eff";
-                        this.buttonTryAgain.style.color = "white";
+                    if(inputName.value.length >= 3 && inputName.value.length <= 10){
+                        const verifyName = async () => {
+                            const reponse = await fetch("/getData");
+                            const data = await reponse.json();
+                            let verify = true;
+
+                            data.listRanking.forEach(element => {
+                                if(element.userName === inputName.value) {
+                                    this.buttonTryAgain.disabled = true;
+                                    verify = false;
+                                    this.buttonTryAgain.style.backgroundColor = "black";
+                                    this.buttonTryAgain.style.color = "#8e0eff";
+                                    return;
+                                }
+                            });
+
+                            if(verify === true) {
+                                this.buttonTryAgain.disabled = false;
+                                this.buttonTryAgain.style.backgroundColor = "#8e0eff";
+                                this.buttonTryAgain.style.color = "white";
+                            }
+                        };
+
+                        verifyName();
                     } else {
                         this.buttonTryAgain.disabled = true;
                         this.buttonTryAgain.style.backgroundColor = "black";
@@ -397,11 +416,30 @@ class Board {
                 inputName.classList.add("inputName");
 
                 inputName.addEventListener("input", () => {
-                    const inputToString = inputName.value.toString();
-                    if(inputToString.length >= 3 && inputToString.length <= 10){
-                        this.buttonTryAgain.disabled = false;
-                        this.buttonTryAgain.style.backgroundColor = "#8e0eff";
-                        this.buttonTryAgain.style.color = "white";
+                    if(inputName.value.length >= 3 && inputName.value.length <= 10){
+                        const verifyName = async () => {
+                            const reponse = await fetch("/getData");
+                            const data = await reponse.json();
+                            let verify = true;
+
+                            data.listRanking.forEach(element => {
+                                if(element.userName === inputName.value) {
+                                    this.buttonTryAgain.disabled = true;
+                                    verify = false;
+                                    this.buttonTryAgain.style.backgroundColor = "black";
+                                    this.buttonTryAgain.style.color = "#8e0eff";
+                                    return;
+                                }
+                            });
+
+                            if(verify === true) {
+                                this.buttonTryAgain.disabled = false;
+                                this.buttonTryAgain.style.backgroundColor = "#8e0eff";
+                                this.buttonTryAgain.style.color = "white";
+                            }
+                        };
+
+                        verifyName();
                     } else {
                         this.buttonTryAgain.disabled = true;
                         this.buttonTryAgain.style.backgroundColor = "black";
@@ -597,8 +635,24 @@ const updateName = () => {
         return;
     }
 
+    board.stop = true;
+    const menuItens = document.querySelector("#menuItens");
+
+    menuItens.style.display = "none";
+    document.querySelector("#menuHamburguerSpan").style.color = "black";
+
     const menu = document.querySelector(".board").appendChild(document.createElement("div"));
     menu.classList.add("menu");
+    const a = menu.appendChild(document.createElement("a"));
+    a.id = "aMenu";
+    a.style.textDecoration = "none";
+    a.style.color = "#8e0eff";
+    a.href = "/";
+
+    const spanA = a.appendChild(document.createElement("span"));
+    spanA.innerHTML = "X";
+    spanA.id = "spanA";
+
     menu.appendChild(document.createElement("span")).innerHTML = "Mudar Nome";
 
     const form = menu.appendChild(document.createElement("form"));
@@ -609,13 +663,33 @@ const updateName = () => {
     inputName.placeholder = "Digite o novo nome...";
     inputName.name = "userName";
     inputName.classList.add("inputName");
+    inputName.focus();
 
     inputName.addEventListener("input", () => {
-        const inputToString = inputName.value.toString();
-        if(inputToString.length >= 3 && inputToString.length <= 10){
-            button.disabled = false;
-            button.style.backgroundColor = "#8e0eff";
-            button.style.color = "white";
+        if(inputName.value.length >= 3 && inputName.value.length <= 10){
+            const verifyName = async () => {
+                const reponse = await fetch("/getData");
+                const data = await reponse.json();
+                let verify = true;
+
+                data.listRanking.forEach(element => {
+                    if(element.userName === inputName.value) {
+                        button.disabled = true;
+                        verify = false;
+                        button.style.backgroundColor = "black";
+                        button.style.color = "#8e0eff";
+                        return;
+                    }
+                });
+
+                if(verify === true) {
+                    button.disabled = false;
+                    button.style.backgroundColor = "#8e0eff";
+                    button.style.color = "white";
+                }
+            };
+
+            verifyName();
         } else {
             button.disabled = true;
             button.style.backgroundColor = "black";
