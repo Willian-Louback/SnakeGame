@@ -590,3 +590,50 @@ const menuClick = () => {
             (document.querySelector("#menuHamburguerSpan").style.color = "black")
         );
 };
+
+const updateName = () => {
+    if(!localStorage.name){
+        alert("Você precisa de um nome antes...");
+        return;
+    }
+
+    const menu = document.querySelector(".board").appendChild(document.createElement("div"));
+    menu.classList.add("menu");
+    menu.appendChild(document.createElement("span")).innerHTML = "Mudar Nome";
+
+    const form = menu.appendChild(document.createElement("form"));
+    form.method = "POST";
+
+    const inputName = form.appendChild(document.createElement("input"));
+    inputName.type = "text";
+    inputName.placeholder = "Digite o novo nome...";
+    inputName.name = "userName";
+    inputName.classList.add("inputName");
+
+    inputName.addEventListener("input", () => {
+        const inputToString = inputName.value.toString();
+        if(inputToString.length >= 3 && inputToString.length <= 10){
+            button.disabled = false;
+            button.style.backgroundColor = "#8e0eff";
+            button.style.color = "white";
+        } else {
+            button.disabled = true;
+            button.style.backgroundColor = "black";
+            button.style.color = "#8e0eff";
+        }
+    });
+
+    const button = form.appendChild(document.createElement("input"));
+    button.type = "submit";
+    button.value = "Salvar";
+    button.name = "submitName";
+    button.classList.add("buttonTryAgain");
+    button.addEventListener("click", () => {
+        button.disabled = true;
+        form.action = `/updateName/${localStorage.name}/${inputName.value}`;
+        localStorage.name = inputName.value;
+        button.style.backgroundColor = "black";
+        button.style.color = "#8e0eff";
+        form.submit();
+    });
+};
