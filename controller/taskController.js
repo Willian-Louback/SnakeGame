@@ -39,9 +39,19 @@ const saveScore = async (req, res) => {
     }
 };
 
+const updateScore = async (req, res) => {
+    const dataRanking = await Ranking.findOne({ userName: req.params.userName });
+    try {
+        await Ranking.updateOne({ _id: dataRanking._id }, { score: req.params.score });
+    } catch(error) {
+        res.status(500).send({error: error.message});
+    }
+};
+
 module.exports = {
     renderPage,
     renderRanking,
     getData,
-    saveScore
+    saveScore,
+    updateScore
 };

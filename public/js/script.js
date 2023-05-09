@@ -1,8 +1,7 @@
-const columnBoard = 10;
-const lineBoard = 10;
+const columnBoard = 5;
+const lineBoard = 5;
 let attemps = 0;
-let maxScore = 0;
-
+let maxScore = localStorage.score || 0;
 class Board {
     constructor(column, line){
         this.column = column;
@@ -27,6 +26,7 @@ class Board {
 
 
     build(){
+        document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
         const boardMain = document.querySelector(".board");
         boardMain.style.gridTemplateColumns = `repeat(${this.column}, 1fr)`;
         boardMain.style.gridTemplateRows = `repeat(${this.line}, 1fr)`;
@@ -109,7 +109,7 @@ class Board {
 
     calculateScore(){
         this.score += 10;
-        document.querySelector("#score").innerHTML = `Pontuação: ${this.score}`;
+        document.querySelector("#score").innerHTML = `Score: ${this.score}`;
     }
 
     generateFood(){
@@ -133,7 +133,7 @@ class Board {
         function tryAgainF(target){
             if((target.key === " ") || (target.key === "Enter")){
                 document.removeEventListener("keydown", tryAgainF);
-                document.querySelector("#score").innerHTML = `Pontuação: 0`;
+                document.querySelector("#score").innerHTML = `Score: 0`;
                 const food = document.querySelector(".food");
                 food ? food.classList.remove("food") : null;
 
@@ -153,6 +153,10 @@ class Board {
         const verifyDB = async () => {
             const reponse = await fetch("/getData");
             const data = await reponse.json();
+
+            if(localStorage.name){
+                return false;
+            }
 
             if(!data.listRanking[9]){
                 return true;
@@ -184,7 +188,7 @@ class Board {
 
                 a.addEventListener("click", () => {
                     document.removeEventListener("keydown", tryAgainF);
-                    document.querySelector("#score").innerHTML = `Pontuação: 0`;
+                    document.querySelector("#score").innerHTML = `Score: 0`;
                     const food = document.querySelector(".food");
                     food ? food.classList.remove("food") : null;
 
@@ -240,12 +244,50 @@ class Board {
                 this.buttonTryAgain.classList.add("buttonTryAgain");
                 this.buttonTryAgain.addEventListener("click", () => {
                     this.buttonTryAgain.disabled = true;
+                    localStorage.name = inputName.value;
+                    localStorage.score = inputScore.value;
                     this.buttonTryAgain.style.backgroundColor = "black";
                     this.buttonTryAgain.style.color = "#8e0eff";
                     form.submit();
                 });
+            } else if(
+                (maxScore < this.score) &&
+                (result === false)
+            ){
+                maxScore = this.score;
+                document.querySelector("#maxScore").innerHTML = `Melhor Score ${maxScore}`;
+                this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
+                this.menu.classList.add("menu");
+                this.menu.appendChild(document.createElement("span")).innerHTML = "New record!";
+                this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
+                this.buttonTryAgain.classList.add("buttonTryAgain");
+                this.buttonTryAgain.innerHTML = "Try Again";
+
+                document.addEventListener("keydown", tryAgainF);
+                localStorage.score = this.score;
+
+                fetch(`/updateScore/${localStorage.name}/${this.score}`, {
+                    method: "POST"
+                }).catch(err => console.error(err));
+
+                this.buttonTryAgain.addEventListener("click", () => {
+                    document.removeEventListener("keydown", tryAgainF);
+                    document.querySelector("#score").innerHTML = `Score: 0`;
+                    const food = document.querySelector(".food");
+                    food ? food.classList.remove("food") : null;
+
+                    document.querySelectorAll(".square").forEach(value => {
+                        value.remove();
+                    });
+
+                    this.menu.remove();
+
+                    setTimeout(() => {
+                        board = new Board(columnBoard, lineBoard);
+                        board.build();
+                    }, 200);
+                });
             } else {
-                document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
                 this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
                 this.menu.classList.add("menu");
                 this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
@@ -257,7 +299,7 @@ class Board {
 
                 this.buttonTryAgain.addEventListener("click", () => {
                     document.removeEventListener("keydown", tryAgainF);
-                    document.querySelector("#score").innerHTML = `Pontuação: 0`;
+                    document.querySelector("#score").innerHTML = `Score: 0`;
                     const food = document.querySelector(".food");
                     food ? food.classList.remove("food") : null;
 
@@ -282,89 +324,141 @@ class Board {
         this.stop = true;
         clearInterval(this.setIntervalID);
 
-        if(maxScore < this.score){
-            maxScore = this.score;
-            document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
-            this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
-            this.menu.classList.add("menu");
-            const a = this.menu.appendChild(document.createElement("a"));
-            a.id = "aMenu";
-            const spanA = a.appendChild(document.createElement("span"));
-            spanA.innerHTML = "X";
-            spanA.id = "spanA";
+        const verifyDB = async () => {
+            const reponse = await fetch("/getData");
+            const data = await reponse.json();
 
-            this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
-            const spanScore = this.menu.appendChild(document.createElement("span"));
-            spanScore.innerHTML = "Salve o seu score!";
-            spanScore.style.fontSize = "16px";
+            if(localStorage.name){
+                return false;
+            }
 
-            const form = this.menu.appendChild(document.createElement("form"));
-            form.action = "/saveScore";
-            form.method = "POST";
+            if(!data.listRanking[9]){
+                return true;
+            }
 
-            const inputScore = form.appendChild(document.createElement("input"));
-            inputScore.name = "score";
-            inputScore.value = maxScore;
-            inputScore.style.display = "none";
+            if(data.listRanking[9].score < this.score){
+                return true;
+            } else {
+                return false;
+            }
+        };
 
-            const inputName = form.appendChild(document.createElement("input"));
-            inputName.type = "text";
-            inputName.placeholder = "Digite o seu nome...";
-            inputName.name = "userName";
-            inputName.classList.add("inputName");
+        const waitVerify = async() => {
+            const result = await verifyDB();
 
-            inputName.addEventListener("input", () => {
-                const inputToString = inputName.value.toString();
-                if(inputToString.length >= 3 && inputToString.length <= 10){
-                    this.buttonTryAgain.disabled = false;
-                    this.buttonTryAgain.style.backgroundColor = "#8e0eff";
-                    this.buttonTryAgain.style.color = "white";
-                } else {
-                    this.buttonTryAgain.disabled = true;
-                    this.buttonTryAgain.style.backgroundColor = "black";
-                    this.buttonTryAgain.style.color = "#8e0eff";
-                }
-            });
+            if(
+                (maxScore < this.score) &&
+                (result === true)
+            ){
+                maxScore = this.score;
+                document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
+                this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
+                this.menu.classList.add("menu");
+                const a = this.menu.appendChild(document.createElement("a"));
+                a.id = "aMenu";
+                const spanA = a.appendChild(document.createElement("span"));
+                spanA.innerHTML = "X";
+                spanA.id = "spanA";
 
-            this.buttonTryAgain = form.appendChild(document.createElement("input"));
-            this.buttonTryAgain.type = "submit";
-            this.buttonTryAgain.value = "Salvar";
-            this.buttonTryAgain.name = "submitRanking";
-            this.buttonTryAgain.classList.add("buttonTryAgain");
-            this.buttonTryAgain.addEventListener("click", () => {
-                this.buttonTryAgain.disabled = true;
-                this.buttonTryAgain.style.backgroundColor = "black";
-                this.buttonTryAgain.style.color = "#8e0eff";
-                form.submit();
-            });
-        } else {
-            document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
-            this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
-            this.menu.classList.add("menu");
-            this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
-            this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
-            this.buttonTryAgain.classList.add("buttonTryAgain");
-            this.buttonTryAgain.innerHTML = "Try Again";
+                a.addEventListener("click", () => {
+                    document.querySelector("#score").innerHTML = `Score: 0`;
+                    const food = document.querySelector(".food");
+                    food ? food.classList.remove("food") : null;
 
-            this.buttonTryAgain.addEventListener("click", () => {
-                document.querySelector("#score").innerHTML = `Pontuação: 0`;
+                    document.querySelectorAll(".square").forEach(value => {
+                        value.remove();
+                    });
 
-                document.querySelectorAll(".square").forEach(value => {
-                    value.remove();
+                    this.menu.remove();
+
+                    setTimeout(() => {
+                        board = new Board(columnBoard, lineBoard);
+                        board.build();
+                    }, 200);
                 });
 
-                this.menu.remove();
-                attemps = 0;
-                document.querySelector("#attemps").innerHTML = `Tentativas: ${attemps}`;
+                this.menu.appendChild(document.createElement("span")).innerHTML = "Você Venceu!";
+                const spanScore = this.menu.appendChild(document.createElement("span"));
+                spanScore.innerHTML = "Salve o seu score!";
+                spanScore.style.fontSize = "16px";
 
-                setTimeout(() => {
-                    board = new Board(columnBoard, lineBoard);
-                    board.build();
-                }, 200);
-            });
-        }
+                const form = this.menu.appendChild(document.createElement("form"));
+                form.action = "/saveScore";
+                form.method = "POST";
 
-        return;
+                const inputScore = form.appendChild(document.createElement("input"));
+                inputScore.name = "score";
+                inputScore.value = maxScore;
+                inputScore.style.display = "none";
+
+                const inputName = form.appendChild(document.createElement("input"));
+                inputName.type = "text";
+                inputName.placeholder = "Digite o seu nome...";
+                inputName.name = "userName";
+                inputName.classList.add("inputName");
+
+                inputName.addEventListener("input", () => {
+                    const inputToString = inputName.value.toString();
+                    if(inputToString.length >= 3 && inputToString.length <= 10){
+                        this.buttonTryAgain.disabled = false;
+                        this.buttonTryAgain.style.backgroundColor = "#8e0eff";
+                        this.buttonTryAgain.style.color = "white";
+                    } else {
+                        this.buttonTryAgain.disabled = true;
+                        this.buttonTryAgain.style.backgroundColor = "black";
+                        this.buttonTryAgain.style.color = "#8e0eff";
+                    }
+                });
+
+                this.buttonTryAgain = form.appendChild(document.createElement("input"));
+                this.buttonTryAgain.type = "submit";
+                this.buttonTryAgain.value = "Salvar";
+                this.buttonTryAgain.name = "submitRanking";
+                this.buttonTryAgain.classList.add("buttonTryAgain");
+                this.buttonTryAgain.addEventListener("click", () => {
+                    this.buttonTryAgain.disabled = true;
+                    localStorage.name = inputName.value;
+                    localStorage.score = inputScore.value;
+                    this.buttonTryAgain.style.backgroundColor = "black";
+                    this.buttonTryAgain.style.color = "#8e0eff";
+                    form.submit();
+                });
+            } else {
+                maxScore = this.score;
+                document.querySelector("#maxScore").innerHTML = `Melhor Score ${maxScore}`;
+                this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
+                this.menu.classList.add("menu");
+                this.menu.appendChild(document.createElement("span")).innerHTML = "Você venceu!";
+                this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
+                this.buttonTryAgain.classList.add("buttonTryAgain");
+                this.buttonTryAgain.innerHTML = "Try Again";
+
+                localStorage.score = this.score;
+
+                fetch(`/updateScore/${localStorage.name}/${this.score}`, {
+                    method: "POST"
+                }).catch(err => console.error(err));
+
+                this.buttonTryAgain.addEventListener("click", () => {
+                    document.querySelector("#score").innerHTML = `Score: 0`;
+                    const food = document.querySelector(".food");
+                    food ? food.classList.remove("food") : null;
+
+                    document.querySelectorAll(".square").forEach(value => {
+                        value.remove();
+                    });
+
+                    this.menu.remove();
+
+                    setTimeout(() => {
+                        board = new Board(columnBoard, lineBoard);
+                        board.build();
+                    }, 200);
+                });
+            }
+        };
+
+        waitVerify();
     }
 }
 
