@@ -1,5 +1,5 @@
-const columnBoard = 5;
-const lineBoard = 5;
+const columnBoard = 10;
+const lineBoard = 10;
 let attemps = 0;
 let maxScore = localStorage.score || 0;
 class Board {
@@ -207,7 +207,6 @@ class Board {
                 this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
                 const spanScore = this.menu.appendChild(document.createElement("span"));
                 spanScore.innerHTML = "Salve o seu score!";
-                spanScore.style.fontSize = "16px";
 
                 const form = this.menu.appendChild(document.createElement("form"));
                 form.action = "/saveScore";
