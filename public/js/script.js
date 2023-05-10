@@ -640,13 +640,15 @@ const updateName = () => {
     const menu = document.querySelector(".board").appendChild(document.createElement("div"));
     menu.classList.add("menu");
 
-    const spanA = menu.appendChild(document.createElement("span"));
+    const a = menu.appendChild(document.createElement("a"));
+    a.id = "aMenu";
+    a.href = "/";
+    a.style.textDecoration = "none";
+    a.style.color ="#8e0eff";
+
+    const spanA = a.appendChild(document.createElement("span"));
     spanA.innerHTML = "X";
     spanA.id = "spanA";
-    spanA.style.position = "absolute";
-    spanA.style.top = "15px";
-    spanA.style.right = "15px";
-    spanA.onclick = () => menu.remove();
 
     menu.appendChild(document.createElement("span")).innerHTML = "Mudar Nome";
 
@@ -655,7 +657,7 @@ const updateName = () => {
 
     const inputName = form.appendChild(document.createElement("input"));
     inputName.type = "text";
-    inputName.placeholder = "Digite o novo nome...";
+    inputName.placeholder = "Digite o nome...";
     inputName.name = "userName";
     inputName.classList.add("inputName");
     inputName.focus();

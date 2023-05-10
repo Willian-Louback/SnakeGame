@@ -144,12 +144,13 @@ li {
     outline: none;
     border: 1px solid #8e0eff;
     height: 25px;
-    width: 100%;
+    width: 85%;
     padding-left: 10px;
     color: white;
     border-radius: 4px;
     background-color: black;
     caret-color: #8e0eff;
+    font-size: 14px;
 }
 
 .inputName::placeholder {
@@ -259,6 +260,7 @@ form {
 
     .inputName {
         height: 20px;
+        font-size: 10px;
     }
 }
 
