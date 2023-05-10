@@ -10,7 +10,9 @@ const routes = require("./routes/routes");
 
 connectToDb();
 
-app.use(express.static(path.join(__dirname, "public"))); // Autorizando o uso da pasta public
+app.use(express.static(path.join(__dirname, "public"), {
+    maxAge: 300
+})); // Autorizando o uso da pasta public
 app.use(express.urlencoded({ extended: true })); // Para receber o que vier de um form
 app.use(routes);
 app.listen(port, () => console.log(`Online na porta ${port}`));
