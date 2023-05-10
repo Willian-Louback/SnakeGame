@@ -172,10 +172,7 @@ class Board {
         const waitVerify = async() => {
             const result = await verifyDB();
 
-            if(
-                (maxScore < this.score) &&
-                (result === true)
-            ){
+            if(result === true){
                 maxScore = this.score;
                 document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
                 this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
@@ -364,10 +361,7 @@ class Board {
         const waitVerify = async() => {
             const result = await verifyDB();
 
-            if(
-                (maxScore < this.score) &&
-                (result === true)
-            ){
+            if(result === true){
                 maxScore = this.score;
                 document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
                 this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
