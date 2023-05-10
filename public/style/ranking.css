@@ -61,7 +61,6 @@ ul {
 }
 
 span {
-    font-family: 'Press Start 2P', Arial, sans-serif;
     color: #8e0eff;
     margin: 0 15px;
 }
@@ -94,7 +93,6 @@ span {
     color: #8e0eff;
     width: 100%;
     height: 40px;
-    font-family: 'Press Start 2P', Arial, sans-serif;
 }
 
 .spanPlay {

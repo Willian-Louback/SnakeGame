@@ -1,6 +1,7 @@
 * {
     padding: 0;
     margin: 0;
+    font-family: 'Press Start 2P', Arial, sans-serif;
 }
 
 .black {
@@ -11,6 +12,6 @@
     background-color: rgb(25, 25, 25);
 }
 
-.clickLi {
+#spanA, .updateName, .updateColor, .clickLi {
     cursor: pointer;
 }

@@ -1,3 +1,7 @@
+:root {
+    --snake-color: #ff00bb;
+}
+
 body {
     background-image: url("/images/backgroundChespin.webp");
     background-position: bottom;
@@ -32,7 +36,7 @@ main {
 }
 
 .snake {
-    background-color: #8e0eff;
+    background-color: var(--snake-color);
     width: 93%;
     height: 93%;
 }
@@ -48,7 +52,6 @@ main {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-family: 'Press Start 2P', Arial, sans-serif;
 }
 
 #score {
@@ -69,7 +72,6 @@ main {
 }
 
 .menu {
-    font-family: 'Press Start 2P', Arial, sans-serif;
     background-color: #000000;
     position: fixed;
     border-radius: 4px;
@@ -86,7 +88,6 @@ main {
 }
 
 .buttonTryAgain {
-    font-family: 'Press Start 2P', Arial, sans-serif;
     cursor: pointer;
     font-size: 14px;
     background-color: black;
@@ -133,7 +134,6 @@ li {
     color: #8e0eff;
     width: 100%;
     height: 40px;
-    font-family: 'Press Start 2P', Arial, sans-serif;
 }
 
 .liSpan {
@@ -170,12 +170,25 @@ form {
     right: 15px;
 }
 
-#spanA {
-    font-family: 'Press Start 2P', Arial, sans-serif;
-    cursor: pointer;
+.divChoiceColor {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    align-items: center;
 }
 
-.updateName {
+.colorExample {
+    border-radius: 100%;
+    height: 25px;
+    width: 25px;
+}
+
+.buttonChoiceColor {
+    background-color: black;
+    color: #8e0eff;
+    border: 1px solid #8e0eff;
+    border-radius: 5px;
+    padding: 10px;
     cursor: pointer;
 }
 
@@ -227,7 +240,6 @@ form {
        height: 90px;
        width: 90px;
        border-radius: 10px;
-       font-size: 25px;
        background-color: black;
        border: 1px solid #8e0eff;
        color: #8e0eff;

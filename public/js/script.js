@@ -2,6 +2,8 @@ const columnBoard = 10;
 const lineBoard = 10;
 let attemps = 0;
 let maxScore = localStorage.score || 0;
+localStorage.snakeColor ? document.documentElement.style.setProperty("--snake-color", localStorage.snakeColor) : null;
+
 class Board {
     constructor(column, line){
         this.column = column;
@@ -260,7 +262,7 @@ class Board {
                 this.buttonTryAgain.addEventListener("click", () => {
                     this.buttonTryAgain.disabled = true;
                     localStorage.name = inputName.value;
-                    localStorage.score = inputScore.value;
+                    localStorage.score = maxScore;
                     this.buttonTryAgain.style.backgroundColor = "black";
                     this.buttonTryAgain.style.color = "#8e0eff";
                     form.submit();
@@ -637,15 +639,14 @@ const updateName = () => {
 
     const menu = document.querySelector(".board").appendChild(document.createElement("div"));
     menu.classList.add("menu");
-    const a = menu.appendChild(document.createElement("a"));
-    a.id = "aMenu";
-    a.style.textDecoration = "none";
-    a.style.color = "#8e0eff";
-    a.href = "/";
 
-    const spanA = a.appendChild(document.createElement("span"));
+    const spanA = menu.appendChild(document.createElement("span"));
     spanA.innerHTML = "X";
     spanA.id = "spanA";
+    spanA.style.position = "absolute";
+    spanA.style.top = "15px";
+    spanA.style.right = "15px";
+    spanA.onclick = () => menu.remove();
 
     menu.appendChild(document.createElement("span")).innerHTML = "Mudar Nome";
 
@@ -704,4 +705,83 @@ const updateName = () => {
         button.style.color = "#8e0eff";
         form.submit();
     });
+};
+
+const snakeColor = () => {
+    const arrayColors = [
+        "#8e0eff",
+        "red",
+        "#33ff00",
+        "white",
+        "blue",
+        "#ff00bb"
+    ];
+
+    let positionColor = localStorage.positionColor || 0;
+
+    const menuItens = document.querySelector("#menuItens");
+
+    menuItens.style.display = "none";
+    document.querySelector("#menuHamburguerSpan").style.color = "black";
+
+    const menu = document.querySelector(".board").appendChild(document.createElement("div"));
+    menu.classList.add("menu");
+
+    const spanA = menu.appendChild(document.createElement("span"));
+    spanA.innerHTML = "X";
+    spanA.id = "spanA";
+    spanA.style.position = "absolute";
+    spanA.style.top = "15px";
+    spanA.style.right = "15px";
+    spanA.onclick = () => menu.remove();
+
+    menu.appendChild(document.createElement("span")).innerHTML = "Mudar Cor";
+
+    const divChoiceColor = menu.appendChild(document.createElement("div"));
+    divChoiceColor.classList.add("divChoiceColor");
+
+    const buttonLeftColor = divChoiceColor.appendChild(document.createElement("button"));
+    buttonLeftColor.innerHTML = "<-";
+    buttonLeftColor.classList.add("buttonChoiceColor");
+
+    const colorExample = divChoiceColor.appendChild(document.createElement("div"));
+    colorExample.classList.add("colorExample");
+    colorExample.style.backgroundColor = arrayColors[positionColor];
+
+    const buttonRightColor = divChoiceColor.appendChild(document.createElement("button"));
+    buttonRightColor.innerHTML = "->";
+    buttonRightColor.classList.add("buttonChoiceColor");
+
+    const buttonSave = menu.appendChild(document.createElement("button"));
+    buttonSave.innerHTML = "Salvar";
+    buttonSave.classList.add("buttonTryAgain");
+
+    buttonLeftColor.onclick = () => {
+        if(positionColor != 0){
+            positionColor--;
+        } else {
+            positionColor = arrayColors.length - 1;
+        }
+
+        colorExample.style.backgroundColor = arrayColors[positionColor];
+    };
+
+    buttonRightColor.onclick = () => {
+        if(positionColor != arrayColors.length - 1){
+            positionColor++;
+        } else {
+            positionColor = 0;
+        }
+
+        colorExample.style.backgroundColor = arrayColors[positionColor];
+    };
+
+
+    buttonSave.onclick = () => {
+        localStorage.positionColor = positionColor;
+        localStorage.snakeColor = arrayColors[positionColor];
+        document.documentElement.style.setProperty("--snake-color", arrayColors[positionColor]);
+
+        menu.remove();
+    };
 };
