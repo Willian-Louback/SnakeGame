@@ -332,22 +332,11 @@ class Board {
         clearInterval(this.setIntervalID);
 
         const verifyDB = async () => {
-            const reponse = await fetch("/getData");
-            const data = await reponse.json();
-
             if(localStorage.name){
                 return false;
             }
 
-            if(!data.listRanking[9]){
-                return true;
-            }
-
-            if(data.listRanking[9].score < this.score){
-                return true;
-            } else {
-                return false;
-            }
+            return true;
         };
 
         const waitVerify = async() => {
