@@ -18,6 +18,15 @@ const getData = async (_req, res) => {
     }
 };
 
+const getAllData = async (_req, res) => {
+    try {
+        const listRanking = await Ranking.find().sort({ score: -1 });
+        return res.json({ listRanking });
+    } catch(error) {
+        res.status(500).send({error: error.message});
+    }
+};
+
 const saveScore = async (req, res) => {
     const dataRanking = req.body;
     /*const listDelete = await Ranking.find().sort({ score: -1 }).skip(10);
@@ -64,5 +73,6 @@ module.exports = {
     getData,
     saveScore,
     updateScore,
-    updateName
+    updateName,
+    getAllData
 };

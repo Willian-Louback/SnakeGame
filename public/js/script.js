@@ -2,7 +2,16 @@ const columnBoard = 10;
 const lineBoard = 10;
 let attemps = 0;
 let maxScore = localStorage.score || 0;
-localStorage.snakeColor ? document.documentElement.style.setProperty("--snake-color", localStorage.snakeColor) : null;
+
+function loadInfo() {
+    localStorage.snakeColor ? document.documentElement.style.setProperty("--snake-color", localStorage.snakeColor) : null;
+    const getName = document.querySelector("#getName");
+    const nameLi = document.querySelector(".nameLi");
+    getName.innerHTML = localStorage.name || "Anônimo";
+    !localStorage.name ? nameLi.style.cursor = "pointer" : nameLi.style.cursor = "default";
+}
+
+loadInfo();
 
 class Board {
     constructor(column, line){
@@ -165,6 +174,7 @@ class Board {
 
             if(result === true){
                 maxScore = this.score;
+                localStorage.score = maxScore;
                 document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
                 this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
                 this.menu.classList.add("menu");
@@ -213,8 +223,12 @@ class Board {
 
                 inputName.addEventListener("input", () => {
                     if(inputName.value.length >= 3 && inputName.value.length <= 10){
+                        this.buttonTryAgain.disabled = true;
+                        this.buttonTryAgain.style.backgroundColor = "black";
+                        this.buttonTryAgain.style.color = "#8e0eff";
+
                         const verifyName = async () => {
-                            const reponse = await fetch("/getData");
+                            const reponse = await fetch("/getAllData");
                             const data = await reponse.json();
                             let verify = true;
 
@@ -251,7 +265,6 @@ class Board {
                 this.buttonTryAgain.addEventListener("click", () => {
                     this.buttonTryAgain.disabled = true;
                     localStorage.name = inputName.value;
-                    localStorage.score = maxScore;
                     this.buttonTryAgain.style.backgroundColor = "black";
                     this.buttonTryAgain.style.color = "#8e0eff";
                     form.submit();
@@ -344,6 +357,7 @@ class Board {
 
             if(result === true){
                 maxScore = this.score;
+                localStorage.score = maxScore;
                 document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
                 this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
                 this.menu.classList.add("menu");
@@ -392,8 +406,12 @@ class Board {
 
                 inputName.addEventListener("input", () => {
                     if(inputName.value.length >= 3 && inputName.value.length <= 10){
+                        this.buttonTryAgain.disabled = true;
+                        this.buttonTryAgain.style.backgroundColor = "black";
+                        this.buttonTryAgain.style.color = "#8e0eff";
+
                         const verifyName = async () => {
-                            const reponse = await fetch("/getData");
+                            const reponse = await fetch("/getAllData");
                             const data = await reponse.json();
                             let verify = true;
 
@@ -643,8 +661,12 @@ const updateName = () => {
 
     inputName.addEventListener("input", () => {
         if(inputName.value.length >= 3 && inputName.value.length <= 10){
+            button.disabled = true;
+            button.style.backgroundColor = "black";
+            button.style.color = "#8e0eff";
+
             const verifyName = async () => {
-                const reponse = await fetch("/getData");
+                const reponse = await fetch("/getAllData");
                 const data = await reponse.json();
                 let verify = true;
 
@@ -765,4 +787,97 @@ const snakeColor = () => {
 
         menu.remove();
     };
+};
+
+const createAccount = () => {
+    if(localStorage.name){
+        return alert(`Este é o seu nome: ${localStorage.name}`);
+    }
+
+    board.stop = true;
+    const menuItens = document.querySelector("#menuItens");
+
+    menuItens.style.display = "none";
+    document.querySelector("#menuHamburguerSpan").style.color = "black";
+
+    const menu = document.querySelector(".board").appendChild(document.createElement("div"));
+    menu.classList.add("menu");
+
+    const a = menu.appendChild(document.createElement("a"));
+    a.id = "aMenu";
+    a.href = "/";
+    a.style.textDecoration = "none";
+    a.style.color ="#8e0eff";
+
+    const spanA = a.appendChild(document.createElement("span"));
+    spanA.innerHTML = "X";
+    spanA.id = "spanA";
+
+    menu.appendChild(document.createElement("span")).innerHTML = "Cadastrar User";
+
+    const form = menu.appendChild(document.createElement("form"));
+    form.method = "POST";
+    form.action = `/saveScore`;
+
+    const inputScore = form.appendChild(document.createElement("input"));
+    inputScore.name = "score";
+    inputScore.value = localStorage.score || 0;
+    inputScore.style.display = "none";
+
+    const inputName = form.appendChild(document.createElement("input"));
+    inputName.type = "text";
+    inputName.placeholder = "Digite o nome...";
+    inputName.name = "userName";
+    inputName.classList.add("inputName");
+    inputName.focus();
+
+    inputName.addEventListener("input", () => {
+        if(inputName.value.length >= 3 && inputName.value.length <= 10){
+            button.disabled = true;
+            button.style.backgroundColor = "black";
+            button.style.color = "#8e0eff";
+
+            const verifyName = async () => {
+                const reponse = await fetch("/getAllData");
+                const data = await reponse.json();
+                let verify = true;
+
+                data.listRanking.forEach(element => {
+                    if(element.userName === inputName.value) {
+                        button.disabled = true;
+                        verify = false;
+                        button.style.backgroundColor = "black";
+                        button.style.color = "#8e0eff";
+                        return;
+                    }
+                });
+
+                if(verify === true) {
+                    button.disabled = false;
+                    button.style.backgroundColor = "#8e0eff";
+                    button.style.color = "white";
+                }
+            };
+
+            verifyName();
+        } else {
+            button.disabled = true;
+            button.style.backgroundColor = "black";
+            button.style.color = "#8e0eff";
+        }
+    });
+
+    const button = form.appendChild(document.createElement("input"));
+    button.type = "submit";
+    button.value = "Salvar";
+    button.name = "submitRanking";
+    button.classList.add("buttonTryAgain");
+
+    button.addEventListener("click", () => {
+        button.disabled = true;
+        localStorage.name = inputName.value;
+        button.style.backgroundColor = "black";
+        button.style.color = "#8e0eff";
+        form.submit();
+    });
 };
