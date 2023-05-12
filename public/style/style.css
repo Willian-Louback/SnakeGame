@@ -271,8 +271,8 @@ form {
     }
 
     .board {
-        width: 466px;
-        height: 450px;
+        width: 436px;
+        height: 420px;
         margin-top: 0;
         border: 0.5px solid #8e0eff;
     }
@@ -317,8 +317,8 @@ form {
     }
 
     .menu{
-        height: 380px;
-        width: 330px;
+        height: 360px;
+        width: 310px;
         font-size: 18px;
     }
 }
@@ -330,8 +330,8 @@ form {
     }
 
     .board {
-        width: 566px;
-        height: 550px;
+        width: 436px;
+        height: 420px;
         margin-top: 0;
         border: 0.5px solid #8e0eff;
     }
@@ -376,8 +376,8 @@ form {
     }
 
     .menu{
-        height: 380px;
-        width: 330px;
+        height: 360px;
+        width: 310px;
         font-size: 18px;
     }
 }
@@ -389,24 +389,23 @@ form {
     }
 
     .board {
-        width: 566px;
-        height: 550px;
+        width: 416px;
+        height: 400px;
         margin-top: 0;
         border: 0.5px solid #8e0eff;
     }
 
     .option {
         align-items: center;
-        height: 150px;
     }
 
     #score {
-        font-size: 34px;
+        font-size: 25px;
         margin-left: 20px;
     }
 
     #attemps {
-        font-size: 34px;
+        font-size: 25px;
         margin-right: 20px;
     }
 

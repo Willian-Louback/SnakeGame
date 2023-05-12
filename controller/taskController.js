@@ -1,15 +1,15 @@
 const path = require("path");
 const Ranking = require("../models/schema");
 
-const renderPage = (req, res) => {
+const renderPage = (_req, res) => {
     return res.sendFile(path.join(__dirname, "../public", "pages", "index.html"));
 };
 
-const renderRanking = (req, res) => {
+const renderRanking = (_req, res) => {
     return res.sendFile(path.join(__dirname, "../public", "pages", "ranking.html"));
 };
 
-const getData = async (req, res) => {
+const getData = async (_req, res) => {
     try {
         const listRanking = await Ranking.find().sort({ score: -1 }).limit(10);
         return res.json({ listRanking });
