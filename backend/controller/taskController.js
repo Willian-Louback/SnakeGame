@@ -1,27 +1,28 @@
-const path = require("path");
 const Ranking = require("../models/schema");
 
 const renderPage = (_req, res) => {
-    return res.sendFile(path.join(__dirname, "../public", "pages", "index.html"));
+    return res.redirect(process.env.BASE_URL + "/index.html");
 };
 
 const renderRanking = (_req, res) => {
-    return res.sendFile(path.join(__dirname, "../public", "pages", "ranking.html"));
+    return res.redirect(process.env.BASE_URL + "/pages/ranking.html");
 };
 
 const getData = async (req, res) => {
     try {
-        const listRanking = await Ranking.find().sort({ [`score${req.params.position}`]: -1 }).limit(10);
-        return res.json({ listRanking });
+        const listRanking = await Ranking.find().sort({ [`scores${[req.params.position]}`]: -1 }).limit(10); //Cpmsertar aqui
+        const users = listRanking.map(user => ({ userName: user.userName, scores: user.scores }));
+        return res.status(200).json(users);
     } catch(error) {
         res.status(500).send({error: error.message});
     }
-};
+}; //Consertar aqui
 
 const getAllData = async (_req, res) => {
     try {
-        const listRanking = await Ranking.find().sort({ score: -1 });
-        return res.json({ listRanking });
+        const rankingList = await Ranking.find().sort({ score: -1 });
+        const users = rankingList.map(user => ({ userName: user.userName, scores: user.scores }));
+        return res.status(200).json(users);
     } catch(error) {
         res.status(500).send({error: error.message});
     }
@@ -29,6 +30,7 @@ const getAllData = async (_req, res) => {
 
 const saveScore = async (req, res) => {
     const dataRanking = req.body;
+    console.log(dataRanking);
     /*const listDelete = await Ranking.find().sort({ score: -1 }).skip(10);
 
     listDelete.forEach(async (element) => {
@@ -42,7 +44,7 @@ const saveScore = async (req, res) => {
 
     try{
         await Ranking.create(dataRanking);
-        return res.redirect("/");
+        return res.status(201).json({ message: "created" });
     } catch(error) {
         res.status(500).send({error: error.message});
     }
@@ -63,7 +65,7 @@ const updateName = async (req, res) => {
     const dataRanking = await Ranking.findOne({ userName: req.params.userName });
     try {
         await Ranking.updateOne({ _id: dataRanking._id }, { userName: req.params.newUserName });
-        return res.redirect("/");
+        return res.status(200).json({ message: "updated" });
     } catch(error) {
         res.status(500).send({error: error.message});
     }

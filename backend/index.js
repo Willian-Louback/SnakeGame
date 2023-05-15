@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
-const path = require("path");
 const connectToDb = require("./database/db");
+const cors = require("cors");
 
 require("dotenv").config({ path: "./secure/.env" });
 
@@ -10,10 +10,12 @@ const routes = require("./routes/routes");
 
 connectToDb();
 
-app.use(express.static(path.join(__dirname, "public"), {
-    maxAge: 300
-})); // Autorizando o uso da pasta public
+app.use(cors({
+    origin: "https://snakegamewillian.netlify.app/"
+}));
 
 app.use(express.urlencoded({ extended: true })); // Para receber o que vier de um form
+app.use(express.json());
 app.use(routes);
+
 app.listen(port, () => console.log(`Online na porta ${port}`));

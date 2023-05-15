@@ -4,6 +4,7 @@ let attemps = 0;
 let maxScore = localStorage.score ? JSON.parse(localStorage.score) : [0, 0, 0];
 let boardMode = localStorage.boardMode || "Normal";
 let positionBoard = localStorage.positionBoard || 1;
+const BASE_URL = "https://snakegametest-production.up.railway.app";
 
 function loadInfo() {
     localStorage.snakeColor ? document.documentElement.style.setProperty("--snakeColor", localStorage.snakeColor) : null;
@@ -213,7 +214,7 @@ class Board {
                 form.method = "POST";
 
                 const inputScore = form.appendChild(document.createElement("input"));
-                inputScore.name = `score${positionBoard}`;
+                inputScore.name = `scores${[positionBoard]}`;
                 inputScore.value = this.score;
                 inputScore.style.display = "none";
 
@@ -396,7 +397,7 @@ class Board {
                 form.method = "POST";
 
                 const inputScore = form.appendChild(document.createElement("input"));
-                inputScore.name = `score${positionBoard}`;
+                inputScore.name = `scores${[positionBoard]}`;
                 inputScore.value = this.score;
                 inputScore.style.display = "none";
 

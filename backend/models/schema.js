@@ -1,19 +1,8 @@
 const mongoose = require("mongoose");
 
 const taskSchema = new mongoose.Schema({
-    score0: {
-        type: Number,
-        default: 0,
-        required: true
-    },
-    score1: {
-        type: Number,
-        default: 0,
-        required: true
-    },
-    score2: {
-        type: Number,
-        default: 0,
+    scores: {
+        type: [Number],
         required: true
     },
     userName: {
