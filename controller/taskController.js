@@ -9,9 +9,9 @@ const renderRanking = (_req, res) => {
     return res.sendFile(path.join(__dirname, "../public", "pages", "ranking.html"));
 };
 
-const getData = async (_req, res) => {
+const getData = async (req, res) => {
     try {
-        const listRanking = await Ranking.find().sort({ score: -1 }).limit(10);
+        const listRanking = await Ranking.find().sort({ [`score${req.params.position}`]: -1 }).limit(10);
         return res.json({ listRanking });
     } catch(error) {
         res.status(500).send({error: error.message});
@@ -49,9 +49,11 @@ const saveScore = async (req, res) => {
 };
 
 const updateScore = async (req, res) => {
+    const position = req.params.position;
+
     const dataRanking = await Ranking.findOne({ userName: req.params.userName });
     try {
-        await Ranking.updateOne({ _id: dataRanking._id }, { score: req.params.score });
+        await Ranking.updateOne({ _id: dataRanking._id }, { [`score${position}`]: req.params.score });
     } catch(error) {
         res.status(500).send({error: error.message});
     }

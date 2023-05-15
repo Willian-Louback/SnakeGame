@@ -1,5 +1,5 @@
 :root {
-    --snake-color: #8e0eff;
+    --snakeColor: #8e0eff;
 }
 
 body {
@@ -37,7 +37,7 @@ main {
 }
 
 .snake {
-    background-color: var(--snake-color);
+    background-color: var(--snakeColor);
     width: 93%;
     height: 93%;
 }
@@ -84,7 +84,7 @@ main {
     align-items: center;
     gap: 30px;
     border: 1px solid #8e0eff;
-    font-size: 23px;
+    font-size: 18px;
     color: #8e0eff;
 }
 
@@ -186,13 +186,32 @@ form {
     width: 25px;
 }
 
-.buttonChoiceColor {
+.divChoiceBoard {
+    display: flex;
+    flex-direction: row;
+    gap: 55px;
+    align-items: center;
+}
+
+.boardHW {
+    height: 25px;
+    width: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.buttonChoiceColor, .buttonChoiceBoard {
     background-color: black;
     color: #8e0eff;
     border: 1px solid #8e0eff;
     border-radius: 5px;
     padding: 10px;
     cursor: pointer;
+}
+
+#spanBoard {
+    font-size: 18px;
 }
 
 @media screen and (max-width: 480px){
@@ -255,14 +274,22 @@ form {
     }
 
     .buttonTryAgain {
-        height: 44px;
+        height: 40px;
         width: 130px;
-        font-size: 13px;
+        font-size: 11px;
     }
 
     .inputName {
         height: 20px;
         font-size: 10px;
+    }
+
+    .divChoiceBoard {
+        gap: 40px;
+    }
+
+    #spanBoard {
+        font-size: 12px;
     }
 }
 
@@ -321,7 +348,7 @@ form {
     .menu{
         height: 360px;
         width: 310px;
-        font-size: 18px;
+        font-size: 17px;
     }
 }
 
@@ -380,7 +407,7 @@ form {
     .menu{
         height: 360px;
         width: 310px;
-        font-size: 18px;
+        font-size: 17px;
     }
 }
 

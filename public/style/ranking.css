@@ -20,9 +20,37 @@ nav {
     z-index: 2;
 }
 
+.container-main {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: end;
+    width: 40%;
+    position: relative;
+}
+
+.titleButton {
+    cursor: pointer;
+    font-size: 14px;
+    background-color: black;
+    color: #8e0eff;
+    height: 40px;
+    width: 140px;
+    /*border-top: 1px solid #8e0eff;
+    border-left: 1px solid #8e0eff;
+    border-right: 1px solid #8e0eff;
+    border-bottom: none;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;*/
+    border: 1px solid #8e0eff;
+    border-radius: 5px;
+    transition: all 0.5s ease-in-out;
+}
+
 .title {
     color: black;
     font-size: 25px;
+    margin-right: 40px;
 }
 
 .areaRanking {
@@ -31,7 +59,7 @@ nav {
     border-radius: 4px;
 }
 
-ul {
+.rankingUl {
     height: 100%;
     width: 100%;
     display: flex;
@@ -116,8 +144,39 @@ span {
 }
 
 .infoRanking {
-    font-size: 17px;
+    font-size: 16px;
 }
+
+.container-buttonChoice{
+    position: absolute;
+    left: 0;
+}
+
+.menuChoice {
+    height: 40px;
+    width: 100%;
+    position: absolute;
+}
+
+.liMenuChoice {
+    cursor: pointer;
+    list-style: none;
+    height: 100%;
+    width: 100%;
+    border-left: 1px solid #8e0eff;
+    border-right: 1px solid #8e0eff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8e0eff;
+}
+
+.fixLastHard {
+    border-bottom: 1px solid #8e0eff;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
 
 @media screen and (max-width: 480px){
     body {
@@ -125,7 +184,7 @@ span {
         background-color: #0b9444;
     }
 
-    .areaRanking {
+    .areaRanking, .container-main {
         width: 85%;
     }
 
@@ -135,6 +194,27 @@ span {
 
     .infoRanking {
         font-size: 10px;
+
+    }
+
+    .title {
+        font-size: 20px;
+    }
+
+    .titleButton {
+        cursor: pointer;
+        font-size: 11px;
+        background-color: black;
+        color: #8e0eff;
+        height: 35px;
+        width: 110px;
+        border: 1px solid #8e0eff;
+        border-radius: 5px;
+        transition: all 0.5s ease-in-out;
+    }
+
+    .liMenuChoice {
+        font-size: 12px;
     }
 }
 
@@ -144,7 +224,7 @@ span {
         background-color: #0b9444;
     }
 
-    .areaRanking {
+    .areaRanking, .container-main {
         width: 87%;
     }
 
@@ -163,7 +243,7 @@ span {
         background-color: #0b9444;
     }
 
-    .areaRanking {
+    .areaRanking, .container-main {
         width: 70%;
     }
 

@@ -1,10 +1,12 @@
-const columnBoard = 10;
-const lineBoard = 10;
+const columnBoard = parseInt(localStorage.boardHeight) || 10;
+const lineBoard = parseInt(localStorage.boardWidth) || 10;
 let attemps = 0;
-let maxScore = localStorage.score || 0;
+let maxScore = localStorage.score ? JSON.parse(localStorage.score) : [0, 0, 0];
+let boardMode = localStorage.boardMode || "Normal";
+let positionBoard = localStorage.positionBoard || 1;
 
 function loadInfo() {
-    localStorage.snakeColor ? document.documentElement.style.setProperty("--snake-color", localStorage.snakeColor) : null;
+    localStorage.snakeColor ? document.documentElement.style.setProperty("--snakeColor", localStorage.snakeColor) : null;
     const getName = document.querySelector("#getName");
     const nameLi = document.querySelector(".nameLi");
     getName.innerHTML = localStorage.name || "Anônimo";
@@ -37,7 +39,7 @@ class Board {
 
 
     build(){
-        document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
+        document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore[positionBoard]}`;
         const boardMain = document.querySelector(".board");
         boardMain.style.gridTemplateColumns = `repeat(${this.column}, 1fr)`;
         boardMain.style.gridTemplateRows = `repeat(${this.line}, 1fr)`;
@@ -173,9 +175,9 @@ class Board {
             const result = await verifyDB();
 
             if(result === true){
-                maxScore = this.score;
-                localStorage.score = maxScore;
-                document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
+                maxScore[positionBoard] = this.score;
+                localStorage.score = JSON.stringify(maxScore);
+                document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore[positionBoard]}`;
                 this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
                 this.menu.classList.add("menu");
                 const a = this.menu.appendChild(document.createElement("a"));
@@ -211,8 +213,8 @@ class Board {
                 form.method = "POST";
 
                 const inputScore = form.appendChild(document.createElement("input"));
-                inputScore.name = "score";
-                inputScore.value = maxScore;
+                inputScore.name = `score${positionBoard}`;
+                inputScore.value = this.score;
                 inputScore.style.display = "none";
 
                 const inputName = form.appendChild(document.createElement("input"));
@@ -271,11 +273,12 @@ class Board {
                 });
 
             } else if(
-                (maxScore < this.score) &&
+                (maxScore[positionBoard] < this.score) &&
                 (result === false)
             ){
-                maxScore = this.score;
-                document.querySelector("#maxScore").innerHTML = `Melhor Score ${maxScore}`;
+                maxScore[positionBoard] = this.score;
+                localStorage.score = JSON.stringify(maxScore);
+                document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore[positionBoard]}`;
                 this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
                 this.menu.classList.add("menu");
                 this.menu.appendChild(document.createElement("span")).innerHTML = "New record!";
@@ -284,9 +287,8 @@ class Board {
                 this.buttonTryAgain.innerHTML = "Try Again";
 
                 document.addEventListener("keydown", tryAgainF);
-                localStorage.score = this.score;
 
-                fetch(`/updateScore/${localStorage.name}/${this.score}`, {
+                fetch(`/updateScore/${localStorage.name}/${this.score}/${positionBoard}`, {
                     method: "POST"
                 }).catch(err => console.error(err));
 
@@ -356,9 +358,9 @@ class Board {
             const result = await verifyDB();
 
             if(result === true){
-                maxScore = this.score;
-                localStorage.score = maxScore;
-                document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore}`;
+                maxScore[positionBoard] = this.score;
+                localStorage.score = JSON.stringify(maxScore);
+                document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore[positionBoard]}`;
                 this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
                 this.menu.classList.add("menu");
                 const a = this.menu.appendChild(document.createElement("a"));
@@ -394,8 +396,8 @@ class Board {
                 form.method = "POST";
 
                 const inputScore = form.appendChild(document.createElement("input"));
-                inputScore.name = "score";
-                inputScore.value = maxScore;
+                inputScore.name = `score${positionBoard}`;
+                inputScore.value = this.score;
                 inputScore.style.display = "none";
 
                 const inputName = form.appendChild(document.createElement("input"));
@@ -448,14 +450,15 @@ class Board {
                 this.buttonTryAgain.addEventListener("click", () => {
                     this.buttonTryAgain.disabled = true;
                     localStorage.name = inputName.value;
-                    localStorage.score = inputScore.value;
+                    localStorage.score = this.score;
                     this.buttonTryAgain.style.backgroundColor = "black";
                     this.buttonTryAgain.style.color = "#8e0eff";
                     form.submit();
                 });
             } else {
-                maxScore = this.score;
-                document.querySelector("#maxScore").innerHTML = `Melhor Score ${maxScore}`;
+                maxScore[positionBoard] = this.score;
+                localStorage.score = JSON.stringify(maxScore);
+                document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore[positionBoard]}`;
                 this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
                 this.menu.classList.add("menu");
                 this.menu.appendChild(document.createElement("span")).innerHTML = "Você venceu!";
@@ -463,9 +466,7 @@ class Board {
                 this.buttonTryAgain.classList.add("buttonTryAgain");
                 this.buttonTryAgain.innerHTML = "Try Again";
 
-                localStorage.score = this.score;
-
-                fetch(`/updateScore/${localStorage.name}/${this.score}`, {
+                fetch(`/updateScore/${localStorage.name}/${this.score}/${positionBoard}`, {
                     method: "POST"
                 }).catch(err => console.error(err));
 
@@ -783,7 +784,7 @@ const snakeColor = () => {
     buttonSave.onclick = () => {
         localStorage.positionColor = positionColor;
         localStorage.snakeColor = arrayColors[positionColor];
-        document.documentElement.style.setProperty("--snake-color", arrayColors[positionColor]);
+        document.documentElement.style.setProperty("--snakeColor", arrayColors[positionColor]);
 
         menu.remove();
     };
@@ -880,4 +881,81 @@ const createAccount = () => {
         button.style.color = "#8e0eff";
         form.submit();
     });
+};
+const getBoard = () => {
+    const arrayBoard = [
+        [6, 6, "Easy"],
+        [10, 10, "Normal"],
+        [15, 15, "Hard"]
+    ];
+
+    let positionBoard = localStorage.positionBoard || 1;
+
+    const menuItens = document.querySelector("#menuItens");
+
+    menuItens.style.display = "none";
+    document.querySelector("#menuHamburguerSpan").style.color = "black";
+
+    const menu = document.querySelector(".board").appendChild(document.createElement("div"));
+    menu.classList.add("menu");
+
+    const spanA = menu.appendChild(document.createElement("span"));
+    spanA.innerHTML = "X";
+    spanA.id = "spanA";
+    spanA.style.position = "absolute";
+    spanA.style.top = "15px";
+    spanA.style.right = "15px";
+    spanA.onclick = () => menu.remove();
+
+    menu.appendChild(document.createElement("span")).innerHTML = "Mudar Tamanho";
+
+    const divChoiceBoard = menu.appendChild(document.createElement("div"));
+    divChoiceBoard.classList.add("divChoiceBoard");
+
+    const buttonLeftBoard = divChoiceBoard.appendChild(document.createElement("button"));
+    buttonLeftBoard.innerHTML = "<-";
+    buttonLeftBoard.classList.add("buttonChoiceBoard");
+
+    const boardHW = divChoiceBoard.appendChild(document.createElement("div"));
+    boardHW.classList.add("boardHW");
+    const spanBoard = boardHW.appendChild(document.createElement("span"));
+    spanBoard.innerHTML = arrayBoard[positionBoard][2];
+    spanBoard.id = "spanBoard";
+
+    const buttonRightBoard = divChoiceBoard.appendChild(document.createElement("button"));
+    buttonRightBoard.innerHTML = "->";
+    buttonRightBoard.classList.add("buttonChoiceBoard");
+
+    const buttonSave = menu.appendChild(document.createElement("button"));
+    buttonSave.innerHTML = "Salvar";
+    buttonSave.classList.add("buttonTryAgain");
+
+    buttonLeftBoard.onclick = () => {
+        if(positionBoard != 0){
+            positionBoard--;
+        } else {
+            positionBoard = arrayBoard.length - 1;
+        }
+
+        spanBoard.innerHTML = arrayBoard[positionBoard][2];
+    };
+
+    buttonRightBoard.onclick = () => {
+        if(positionBoard != arrayBoard.length - 1){
+            positionBoard++;
+        } else {
+            positionBoard = 0;
+        }
+
+        spanBoard.innerHTML = arrayBoard[positionBoard][2];
+    };
+
+
+    buttonSave.onclick = () => {
+        localStorage.positionBoard = positionBoard;
+        localStorage.boardHeight = arrayBoard[positionBoard][0];
+        localStorage.boardWidth = arrayBoard[positionBoard][1];
+
+        window.location.href = "/";
+    };
 };
