@@ -79,21 +79,21 @@ const choiceRanking = () => {
     easy.onclick = () => {
         localStorage.changeMode = "Easy ";
         localStorage.changePosition = 0;
-        window.location.href = "/ranking";
+        window.location.href = "/pages/ranking";
         return;
     };
 
     normal.onclick = () => {
         localStorage.changeMode = "Normal ";
         localStorage.changePosition = 1;
-        window.location.href = "/ranking";
+        window.location.href = "/pages/ranking";
         return;
     };
 
     hard.onclick = () => {
         localStorage.changeMode = "Hard ";
         localStorage.changePosition = 2;
-        window.location.href = "/ranking";
+        window.location.href = "/pages/ranking";
         return;
     };
 };
