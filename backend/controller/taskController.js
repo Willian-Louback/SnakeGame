@@ -11,7 +11,7 @@ const renderRanking = (_req, res) => {
 const getData = async (req, res) => {
     try {
         const listRanking = await Ranking.find().sort({ scores: -1 }).limit(10);
-        const users = listRanking.map(user => ({ userName: user.userName, scores: user.scores[req.params.position] }));
+        const users = listRanking.map(user => ({ listRanking: { userName: user.userName, scores: user.scores[req.params.position] }}));
         return res.status(200).json(users);
     } catch(error) {
         res.status(500).send({error: error.message});
