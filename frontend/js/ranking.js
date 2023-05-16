@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const spanScore = rankingLi.appendChild(document.createElement("span"));
             spanScore.classList.add("infoRanking");
 
-            if(data.listRanking[i].scores !== 0){
+            if(data.listRanking[i].scores !== 0 && data.listRanking[i].scores){
                 if(data.listRanking[i]){
                     i === 0 ? spanName.innerHTML = `<i class="bi bi-trophy first"></i> ${data.listRanking[i].userName}`
                         : (i === 1) ? spanName.innerHTML = `<i class="bi bi-trophy second"></i> ${data.listRanking[i].userName}`
