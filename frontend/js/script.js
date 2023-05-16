@@ -45,13 +45,13 @@ function createMenu(menu, message, key) {
 
     const divForm = menu.appendChild(document.createElement("div"));
     if(key === "saveScore"){
+        menu.appendChild(document.createElement("span")).innerHTML = "Salve o seu score!";
+
         const inputName = divForm.appendChild(document.createElement("input"));
         inputName.type = "text";
         inputName.placeholder = "Digite o seu nome...";
         inputName.name = "userName";
         inputName.classList.add("inputName");
-
-        menu.appendChild(document.createElement("span")).innerHTML = "Salve o seu score!";
 
         inputName.addEventListener("input", () => {
             if(inputName.value.length >= 3 && inputName.value.length <= 10){
