@@ -8,7 +8,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const rankingUl =  document.querySelector(".rankingUl");
 
     const renderList = () => {
-        for(let i = 0; i < 10; i++){
+        let j = 0;
+
+        function createLi(i) {
+            j++;
+
             const rankingLi = rankingUl.appendChild(document.createElement("li"));
             rankingLi.classList.add("list");
             i % 2 === 0 ? rankingLi.classList.add("black") : rankingLi.classList.add("gray");
@@ -19,14 +23,26 @@ document.addEventListener("DOMContentLoaded", async () => {
             spanScore.classList.add("infoRanking");
 
             if(data.listRanking[i].scores !== 0 && data.listRanking[i].scores){
-                if(data.listRanking[i]){
-                    i === 0 ? spanName.innerHTML = `<i class="bi bi-trophy first"></i> ${data.listRanking[i].userName}`
-                        : (i === 1) ? spanName.innerHTML = `<i class="bi bi-trophy second"></i> ${data.listRanking[i].userName}`
-                            : (i === 2) ? spanName.innerHTML = `<i class="bi bi-trophy third"></i> ${data.listRanking[i].userName}`
-                                : spanName.innerHTML = ` ${data.listRanking[i].userName}`;
+                return { spanName, spanScore };
+            }
+        }
 
-                    spanScore.innerHTML = `Score: ${data.listRanking[i].scores}`;
-                }
+        for(let i = 0; i < 10; i++){
+            if(data.listRanking[i].scores !== 0 && data.listRanking[i].scores){
+                const { spanName, spanScore } = createLi(i);
+
+                i === 0 ? spanName.innerHTML = `<i class="bi bi-trophy first"></i> ${data.listRanking[i].userName}`
+                    : (i === 1) ? spanName.innerHTML = `<i class="bi bi-trophy second"></i> ${data.listRanking[i].userName}`
+                        : (i === 2) ? spanName.innerHTML = `<i class="bi bi-trophy third"></i> ${data.listRanking[i].userName}`
+                            : spanName.innerHTML = ` ${data.listRanking[i].userName}`;
+
+                spanScore.innerHTML = `Score: ${data.listRanking[i].scores}`;
+            }
+        }
+
+        if(j < 10){
+            for(let i = (j + 1); i < 10; i++){
+                createLi(i);
             }
         }
     };
