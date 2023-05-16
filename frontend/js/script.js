@@ -99,7 +99,6 @@ function createMenu(menu, message, key) {
         button.addEventListener("click", () => {
             button.disabled = true;
             localStorage.name = inputName.value;
-            localStorage.score = this.score;
             button.style.backgroundColor = "black";
             button.style.color = "#8e0eff";
             fetch(BASE_URL + "/saveScore", {
@@ -150,6 +149,7 @@ function createMenu(menu, message, key) {
         const button = divForm.appendChild(document.createElement("button"));
         button.innerHTML = "Try Again";
         button.name = "updateRanking";
+        button.classList.add("buttonTryAgain");
 
         button.addEventListener("click", () => {
             document.querySelector("#score").innerHTML = `Score: 0`;
@@ -170,6 +170,7 @@ function createMenu(menu, message, key) {
     } else if(key === "lost"){
         const button = divForm.appendChild(document.createElement("button"));
         button.innerHTML = "Try Again";
+        button.classList.add("buttonTryAgain");
 
         button.addEventListener("click", () => {
             document.querySelector("#score").innerHTML = `Score: 0`;
