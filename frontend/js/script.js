@@ -118,10 +118,25 @@ function createMenu(menu, message, key) {
                 })
                 .then(data => {
                     if(data){
-                        localStorage.id = data._id;
+                        localStorage.id = data.id;
                     }
                 })
                 .catch(err => console.error(err));
+
+            document.querySelector("#score").innerHTML = `Score: 0`;
+            const food = document.querySelector(".food");
+            food ? food.classList.remove("food") : null;
+
+            document.querySelectorAll(".square").forEach(value => {
+                value.remove();
+            });
+
+            menu.remove();
+
+            setTimeout(() => {
+                board = new Board(columnBoard, lineBoard);
+                board.build();
+            }, 200);
         });
     } else if(key === "updateScore"){
         fetch(BASE_URL + "/updateScore", {
