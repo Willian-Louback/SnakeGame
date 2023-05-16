@@ -1,8 +1,9 @@
 document.addEventListener("DOMContentLoaded", async () => {
+    const BASE_URL = "https://snakegamewillianbackend.up.railway.app";
     const titleButton = document.querySelector(".titleButton");
     const changePosition = localStorage.changePosition || 1;
     localStorage.changeMode ? titleButton.innerHTML = `${localStorage.changeMode}<i class="bi bi-chevron-compact-down iconChoice" style="font-size: 17px;">` : titleButton.innerHTML = "Normal <i class=\"bi bi-chevron-compact-down iconChoice\" style=\"font-size: 17px;\">";
-    const reponse = await fetch(`/getData/${changePosition}`);
+    const reponse = await fetch(BASE_URL + `/getData/${changePosition}`);
     const data = await reponse.json();
     const rankingUl =  document.querySelector(".rankingUl");
 
