@@ -1,7 +1,7 @@
 const Ranking = require("../models/schema");
 
 const renderPage = (_req, res) => {
-    return res.redirect(process.env.BASE_URL + "/index.html");
+    return res.redirect(process.env.BASE_URL);
 };
 
 const renderRanking = (_req, res) => {
@@ -10,13 +10,13 @@ const renderRanking = (_req, res) => {
 
 const getData = async (req, res) => {
     try {
-        const listRanking = await Ranking.find().sort({ [`scores${[req.params.position]}`]: -1 }).limit(10); //Cpmsertar aqui
-        const users = listRanking.map(user => ({ userName: user.userName, scores: user.scores }));
+        const listRanking = await Ranking.find().sort({ scores: -1 }).limit(10);
+        const users = listRanking.map(user => ({ userName: user.userName, scores: user.scores[req.params.position] }));
         return res.status(200).json(users);
     } catch(error) {
         res.status(500).send({error: error.message});
     }
-}; //Consertar aqui
+};
 
 const getAllData = async (_req, res) => {
     try {
@@ -29,8 +29,8 @@ const getAllData = async (_req, res) => {
 };
 
 const saveScore = async (req, res) => {
-    const dataRanking = req.body;
-    console.log(dataRanking);
+    const dataRanking = req.dataRanking;
+
     /*const listDelete = await Ranking.find().sort({ score: -1 }).skip(10);
 
     listDelete.forEach(async (element) => {
@@ -38,24 +38,34 @@ const saveScore = async (req, res) => {
         console.log(element.userName, "excluido do top 10");
     });*/
 
-    if(!dataRanking.userName){
-        return res.redirect("/");
-    }
-
     try{
-        await Ranking.create(dataRanking);
-        return res.status(201).json({ message: "created" });
+        const savedRanking = await Ranking.create(dataRanking);
+        return res.status(201).json({ message: "created", id: savedRanking._id });
     } catch(error) {
         res.status(500).send({error: error.message});
     }
 };
 
 const updateScore = async (req, res) => {
-    const position = req.params.position;
+    const { position, score, id } = req.body;
 
-    const dataRanking = await Ranking.findOne({ userName: req.params.userName });
+    if(position > 2){
+        return res.status(400).send();
+    }
+
+    const rankingFind = await Ranking.findOne({ _id: id });
+
+    const newScore = rankingFind.scores.map((element, indice) => {
+        if(indice === position) {
+            return score;
+        } else {
+            return element;
+        }
+    });
+
     try {
-        await Ranking.updateOne({ _id: dataRanking._id }, { [`score${position}`]: req.params.score });
+        await Ranking.updateOne({ _id: id }, { scores: newScore });
+        return res.status(200).json({ message: "updated" });
     } catch(error) {
         res.status(500).send({error: error.message});
     }

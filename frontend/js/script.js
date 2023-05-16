@@ -4,7 +4,7 @@ let attemps = 0;
 let maxScore = localStorage.score ? JSON.parse(localStorage.score) : [0, 0, 0];
 let boardMode = localStorage.boardMode || "Normal";
 let positionBoard = localStorage.positionBoard || 1;
-const BASE_URL = "https://snakegametest-production.up.railway.app";
+const BASE_URL = "https://snakegamewillianbackend.up.railway.app";
 
 function loadInfo() {
     localStorage.snakeColor ? document.documentElement.style.setProperty("--snakeColor", localStorage.snakeColor) : null;
@@ -12,6 +12,165 @@ function loadInfo() {
     const nameLi = document.querySelector(".nameLi");
     getName.innerHTML = localStorage.name || "Anônimo";
     !localStorage.name ? nameLi.style.cursor = "pointer" : nameLi.style.cursor = "default";
+}
+
+function createMenu(menu, message, key) {
+    menu.classList.add("menu");
+    menu.appendChild(document.createElement("span")).innerHTML = message;
+
+    const a = menu.appendChild(document.createElement("a"));
+    a.id = "aMenu";
+
+    a.addEventListener("click", () => {
+        document.querySelector("#score").innerHTML = `Score: 0`;
+        const food = document.querySelector(".food");
+        food ? food.classList.remove("food") : null;
+
+        document.querySelectorAll(".square").forEach(value => {
+            value.remove();
+        });
+
+        menu.remove();
+
+        setTimeout(() => {
+            board = new Board(columnBoard, lineBoard);
+            board.build();
+        }, 200);
+    });
+
+
+    const spanA = a.appendChild(document.createElement("span"));
+    spanA.innerHTML = "X";
+    spanA.id = "spanA";
+
+    const divForm = menu.appendChild(document.createElement("div"));
+    if(key === "saveScore"){
+        const inputName = divForm.appendChild(document.createElement("input"));
+        inputName.type = "text";
+        inputName.placeholder = "Digite o seu nome...";
+        inputName.name = "userName";
+        inputName.classList.add("inputName");
+
+        menu.appendChild(document.createElement("span")).innerHTML = "Salve o seu score!";
+
+        inputName.addEventListener("input", () => {
+            if(inputName.value.length >= 3 && inputName.value.length <= 10){
+                button.disabled = true;
+                button.style.backgroundColor = "black";
+                button.style.color = "#8e0eff";
+
+                const verifyName = async () => {
+                    const reponse = await fetch(BASE_URL + "/getAllData");
+                    const data = await reponse.json();
+                    let verify = true;
+
+                    data.listRanking.forEach(element => {
+                        if(element.userName === inputName.value) {
+                            button.disabled = true;
+                            verify = false;
+                            button.style.backgroundColor = "black";
+                            button.style.color = "#8e0eff";
+                            return;
+                        }
+                    });
+
+                    if(verify === true) {
+                        button.disabled = false;
+                        button.style.backgroundColor = "#8e0eff";
+                        button.style.color = "white";
+                    }
+                };
+
+                verifyName();
+            } else {
+                button.disabled = true;
+                button.style.backgroundColor = "black";
+                button.style.color = "#8e0eff";
+            }
+        });
+
+        const button = divForm.appendChild(document.createElement("Button"));
+        button.innerHTML = "Salvar";
+        button.name = "submitRanking";
+        button.classList.add("buttonTryAgain");
+
+        button.addEventListener("click", () => {
+            button.disabled = true;
+            localStorage.name = inputName.value;
+            localStorage.score = this.score;
+            button.style.backgroundColor = "black";
+            button.style.color = "#8e0eff";
+            fetch(BASE_URL + "/saveScore", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ userName: inputName.value, score:  this.score, position: positionBoard })
+            })
+                .then(response => {
+                    if(response.status === 201){
+                        return response.json();
+                    } else {
+                        return null;
+                    }
+                })
+                .then(data => {
+                    if(data){
+                        localStorage.id = data._id;
+                    }
+                })
+                .catch(err => console.error(err));
+        });
+    } else if(key === "updateScore"){
+        fetch(BASE_URL + "/updateScore", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id: localStorage.id, score:  this.score, position: positionBoard })
+        }).then(response => response.status === 200 ? console.log("Deu certo") : console.log("F"));
+
+        const button = divForm.appendChild(document.createElement("button"));
+        button.innerHTML = "Try Again";
+        button.name = "updateRanking";
+
+        button.addEventListener("click", () => {
+            document.querySelector("#score").innerHTML = `Score: 0`;
+            const food = document.querySelector(".food");
+            food ? food.classList.remove("food") : null;
+
+            document.querySelectorAll(".square").forEach(value => {
+                value.remove();
+            });
+
+            menu.remove();
+
+            setTimeout(() => {
+                board = new Board(columnBoard, lineBoard);
+                board.build();
+            }, 200);
+        });
+    } else if(key === "lost"){
+        const button = divForm.appendChild(document.createElement("button"));
+        button.innerHTML = "Try Again";
+
+        button.addEventListener("click", () => {
+            document.querySelector("#score").innerHTML = `Score: 0`;
+            const food = document.querySelector(".food");
+            food ? food.classList.remove("food") : null;
+
+            document.querySelectorAll(".square").forEach(value => {
+                value.remove();
+            });
+
+            menu.remove();
+
+            setTimeout(() => {
+                board = new Board(columnBoard, lineBoard);
+                board.build();
+            }, 200);
+        });
+    }
 }
 
 loadInfo();
@@ -33,8 +192,6 @@ class Board {
     food = [null, null];
     keySwitch = "ArrowLeft";
     moveSpeed = 220;
-    menu = "";
-    buttonTryAgain = "";
     stop = false;
     score = 0;
 
@@ -179,100 +336,8 @@ class Board {
                 maxScore[positionBoard] = this.score;
                 localStorage.score = JSON.stringify(maxScore);
                 document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore[positionBoard]}`;
-                this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
-                this.menu.classList.add("menu");
-                const a = this.menu.appendChild(document.createElement("a"));
-                a.id = "aMenu";
-                const spanA = a.appendChild(document.createElement("span"));
-                spanA.innerHTML = "X";
-                spanA.id = "spanA";
 
-                a.addEventListener("click", () => {
-                    document.removeEventListener("keydown", tryAgainF);
-                    document.querySelector("#score").innerHTML = `Score: 0`;
-                    const food = document.querySelector(".food");
-                    food ? food.classList.remove("food") : null;
-
-                    document.querySelectorAll(".square").forEach(value => {
-                        value.remove();
-                    });
-
-                    this.menu.remove();
-
-                    setTimeout(() => {
-                        board = new Board(columnBoard, lineBoard);
-                        board.build();
-                    }, 200);
-                });
-
-                this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
-                const spanScore = this.menu.appendChild(document.createElement("span"));
-                spanScore.innerHTML = "Salve o seu score!";
-
-                const form = this.menu.appendChild(document.createElement("form"));
-                form.action = "/saveScore";
-                form.method = "POST";
-
-                const inputScore = form.appendChild(document.createElement("input"));
-                inputScore.name = `scores${[positionBoard]}`;
-                inputScore.value = this.score;
-                inputScore.style.display = "none";
-
-                const inputName = form.appendChild(document.createElement("input"));
-                inputName.type = "text";
-                inputName.placeholder = "Digite o seu nome...";
-                inputName.name = "userName";
-                inputName.classList.add("inputName");
-
-                inputName.addEventListener("input", () => {
-                    if(inputName.value.length >= 3 && inputName.value.length <= 10){
-                        this.buttonTryAgain.disabled = true;
-                        this.buttonTryAgain.style.backgroundColor = "black";
-                        this.buttonTryAgain.style.color = "#8e0eff";
-
-                        const verifyName = async () => {
-                            const reponse = await fetch("/getAllData");
-                            const data = await reponse.json();
-                            let verify = true;
-
-                            data.listRanking.forEach(element => {
-                                if(element.userName === inputName.value) {
-                                    this.buttonTryAgain.disabled = true;
-                                    verify = false;
-                                    this.buttonTryAgain.style.backgroundColor = "black";
-                                    this.buttonTryAgain.style.color = "#8e0eff";
-                                    return;
-                                }
-                            });
-
-                            if(verify === true) {
-                                this.buttonTryAgain.disabled = false;
-                                this.buttonTryAgain.style.backgroundColor = "#8e0eff";
-                                this.buttonTryAgain.style.color = "white";
-                            }
-                        };
-
-                        verifyName();
-                    } else {
-                        this.buttonTryAgain.disabled = true;
-                        this.buttonTryAgain.style.backgroundColor = "black";
-                        this.buttonTryAgain.style.color = "#8e0eff";
-                    }
-                });
-
-                this.buttonTryAgain = form.appendChild(document.createElement("input"));
-                this.buttonTryAgain.type = "submit";
-                this.buttonTryAgain.value = "Salvar";
-                this.buttonTryAgain.name = "submitRanking";
-                this.buttonTryAgain.classList.add("buttonTryAgain");
-                this.buttonTryAgain.addEventListener("click", () => {
-                    this.buttonTryAgain.disabled = true;
-                    localStorage.name = inputName.value;
-                    this.buttonTryAgain.style.backgroundColor = "black";
-                    this.buttonTryAgain.style.color = "#8e0eff";
-                    form.submit();
-                });
-
+                createMenu.bind(this)(document.querySelector(".board").appendChild(document.createElement("div")), "Você perdeu", "saveScore");
             } else if(
                 (maxScore[positionBoard] < this.score) &&
                 (result === false)
@@ -280,63 +345,10 @@ class Board {
                 maxScore[positionBoard] = this.score;
                 localStorage.score = JSON.stringify(maxScore);
                 document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore[positionBoard]}`;
-                this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
-                this.menu.classList.add("menu");
-                this.menu.appendChild(document.createElement("span")).innerHTML = "New record!";
-                this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
-                this.buttonTryAgain.classList.add("buttonTryAgain");
-                this.buttonTryAgain.innerHTML = "Try Again";
 
-                document.addEventListener("keydown", tryAgainF);
-
-                fetch(`/updateScore/${localStorage.name}/${this.score}/${positionBoard}`, {
-                    method: "POST"
-                }).catch(err => console.error(err));
-
-                this.buttonTryAgain.addEventListener("click", () => {
-                    document.removeEventListener("keydown", tryAgainF);
-                    document.querySelector("#score").innerHTML = `Score: 0`;
-                    const food = document.querySelector(".food");
-                    food ? food.classList.remove("food") : null;
-
-                    document.querySelectorAll(".square").forEach(value => {
-                        value.remove();
-                    });
-
-                    this.menu.remove();
-
-                    setTimeout(() => {
-                        board = new Board(columnBoard, lineBoard);
-                        board.build();
-                    }, 200);
-                });
+                createMenu.bind(this)(document.querySelector(".board").appendChild(document.createElement("div")), "New Record!", "updateScore");
             } else {
-                this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
-                this.menu.classList.add("menu");
-                this.menu.appendChild(document.createElement("span")).innerHTML = "Você perdeu!";
-                this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
-                this.buttonTryAgain.classList.add("buttonTryAgain");
-                this.buttonTryAgain.innerHTML = "Try Again";
-
-                document.addEventListener("keydown", tryAgainF);
-
-                this.buttonTryAgain.addEventListener("click", () => {
-                    document.removeEventListener("keydown", tryAgainF);
-                    document.querySelector("#score").innerHTML = `Score: 0`;
-                    const food = document.querySelector(".food");
-                    food ? food.classList.remove("food") : null;
-
-                    document.querySelectorAll(".square").forEach(value => {
-                        value.remove();
-                    });
-
-                    this.menu.remove();
-
-                    setTimeout(() => {
-                        board = new Board(columnBoard, lineBoard);
-                        board.build();
-                    }, 200);
-                });
+                createMenu.bind(this)(document.querySelector(".board").appendChild(document.createElement("div")), "Você perdeu!", "lost");
             }
         };
 
@@ -362,131 +374,14 @@ class Board {
                 maxScore[positionBoard] = this.score;
                 localStorage.score = JSON.stringify(maxScore);
                 document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore[positionBoard]}`;
-                this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
-                this.menu.classList.add("menu");
-                const a = this.menu.appendChild(document.createElement("a"));
-                a.id = "aMenu";
-                const spanA = a.appendChild(document.createElement("span"));
-                spanA.innerHTML = "X";
-                spanA.id = "spanA";
 
-                a.addEventListener("click", () => {
-                    document.querySelector("#score").innerHTML = `Score: 0`;
-                    const food = document.querySelector(".food");
-                    food ? food.classList.remove("food") : null;
-
-                    document.querySelectorAll(".square").forEach(value => {
-                        value.remove();
-                    });
-
-                    this.menu.remove();
-
-                    setTimeout(() => {
-                        board = new Board(columnBoard, lineBoard);
-                        board.build();
-                    }, 200);
-                });
-
-                this.menu.appendChild(document.createElement("span")).innerHTML = "Você Venceu!";
-                const spanScore = this.menu.appendChild(document.createElement("span"));
-                spanScore.innerHTML = "Salve o seu score!";
-                spanScore.style.fontSize = "16px";
-
-                const form = this.menu.appendChild(document.createElement("form"));
-                form.action = "/saveScore";
-                form.method = "POST";
-
-                const inputScore = form.appendChild(document.createElement("input"));
-                inputScore.name = `scores${[positionBoard]}`;
-                inputScore.value = this.score;
-                inputScore.style.display = "none";
-
-                const inputName = form.appendChild(document.createElement("input"));
-                inputName.type = "text";
-                inputName.placeholder = "Digite o seu nome...";
-                inputName.name = "userName";
-                inputName.classList.add("inputName");
-
-                inputName.addEventListener("input", () => {
-                    if(inputName.value.length >= 3 && inputName.value.length <= 10){
-                        this.buttonTryAgain.disabled = true;
-                        this.buttonTryAgain.style.backgroundColor = "black";
-                        this.buttonTryAgain.style.color = "#8e0eff";
-
-                        const verifyName = async () => {
-                            const reponse = await fetch("/getAllData");
-                            const data = await reponse.json();
-                            let verify = true;
-
-                            data.listRanking.forEach(element => {
-                                if(element.userName === inputName.value) {
-                                    this.buttonTryAgain.disabled = true;
-                                    verify = false;
-                                    this.buttonTryAgain.style.backgroundColor = "black";
-                                    this.buttonTryAgain.style.color = "#8e0eff";
-                                    return;
-                                }
-                            });
-
-                            if(verify === true) {
-                                this.buttonTryAgain.disabled = false;
-                                this.buttonTryAgain.style.backgroundColor = "#8e0eff";
-                                this.buttonTryAgain.style.color = "white";
-                            }
-                        };
-
-                        verifyName();
-                    } else {
-                        this.buttonTryAgain.disabled = true;
-                        this.buttonTryAgain.style.backgroundColor = "black";
-                        this.buttonTryAgain.style.color = "#8e0eff";
-                    }
-                });
-
-                this.buttonTryAgain = form.appendChild(document.createElement("input"));
-                this.buttonTryAgain.type = "submit";
-                this.buttonTryAgain.value = "Salvar";
-                this.buttonTryAgain.name = "submitRanking";
-                this.buttonTryAgain.classList.add("buttonTryAgain");
-                this.buttonTryAgain.addEventListener("click", () => {
-                    this.buttonTryAgain.disabled = true;
-                    localStorage.name = inputName.value;
-                    localStorage.score = this.score;
-                    this.buttonTryAgain.style.backgroundColor = "black";
-                    this.buttonTryAgain.style.color = "#8e0eff";
-                    form.submit();
-                });
+                createMenu.bind(this)(document.querySelector(".board").appendChild(document.createElement("div")), "Você Venceu!", "saveScore");
             } else {
                 maxScore[positionBoard] = this.score;
                 localStorage.score = JSON.stringify(maxScore);
                 document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore[positionBoard]}`;
-                this.menu = document.querySelector(".board").appendChild(document.createElement("div"));
-                this.menu.classList.add("menu");
-                this.menu.appendChild(document.createElement("span")).innerHTML = "Você venceu!";
-                this.buttonTryAgain = this.menu.appendChild(document.createElement("button"));
-                this.buttonTryAgain.classList.add("buttonTryAgain");
-                this.buttonTryAgain.innerHTML = "Try Again";
 
-                fetch(`/updateScore/${localStorage.name}/${this.score}/${positionBoard}`, {
-                    method: "POST"
-                }).catch(err => console.error(err));
-
-                this.buttonTryAgain.addEventListener("click", () => {
-                    document.querySelector("#score").innerHTML = `Score: 0`;
-                    const food = document.querySelector(".food");
-                    food ? food.classList.remove("food") : null;
-
-                    document.querySelectorAll(".square").forEach(value => {
-                        value.remove();
-                    });
-
-                    this.menu.remove();
-
-                    setTimeout(() => {
-                        board = new Board(columnBoard, lineBoard);
-                        board.build();
-                    }, 200);
-                });
+                createMenu.bind(this)(document.querySelector(".board").appendChild(document.createElement("div")), "Você venceu!", "updateScore");
             }
         };
 
@@ -668,7 +563,7 @@ const updateName = () => {
             button.style.color = "#8e0eff";
 
             const verifyName = async () => {
-                const reponse = await fetch("/getAllData");
+                const reponse = await fetch(BASE_URL + "/getAllData");
                 const data = await reponse.json();
                 let verify = true;
 
@@ -840,7 +735,7 @@ const createAccount = () => {
             button.style.color = "#8e0eff";
 
             const verifyName = async () => {
-                const reponse = await fetch("/getAllData");
+                const reponse = await fetch(BASE_URL + "/getAllData");
                 const data = await reponse.json();
                 let verify = true;
 

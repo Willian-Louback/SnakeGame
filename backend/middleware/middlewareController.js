@@ -1,29 +1,5 @@
 const Ranking = require("../models/schema");
 
-const saveScore = async (req, res, next) => {
-    const dataRanking = req.body;
-
-    if(dataRanking.scores.length !== 3) {
-        return res.status(400).json({ message: "informações erradas." });
-    }
-
-    if(!dataRanking.userName){
-        return res.status(400).json({ message: "Está faltando informações." });
-    } else if(dataRanking.userName == "") {
-        return res.status(204).json({ message: "Conteúdo vazio." });
-    }
-
-    for(let i = 0; i < 3; i++){
-        if(!dataRanking.scores[i]){
-            return res.status(400).json({ message: "Está faltando informações." });
-        } else if(isNaN(dataRanking.scores[i])){
-            return res.status(400).json({ message: "Is NaN." });
-        }
-    }
-
-    next();
-};
-
 const verifyName = async (req, res, next) => {
     const { userName } = req.body;
     const newUserName = req.params.newUserName || userName;
@@ -36,6 +12,38 @@ const verifyName = async (req, res, next) => {
 
     next();
 };
+
+const saveScore = async (req, res, next) => {
+    const { userName, position, score } = req.body;
+    const scores = [];
+
+    if(!userName || !position || !score){
+        return res.status(400).json({ message: "Está faltando informações." });
+    } else if(userName == "" || position == "" || score == "") {
+        return res.status(204).json({ message: "Conteúdo vazio." });
+    }
+
+    if(isNaN(score) || isNaN(position)){
+        return res.status(400).json({ message: "Is NaN." });
+    }
+
+    if(position > 2) {
+        return res.status(400).json({ message: "Informações erradas." });
+    }
+
+    for(let i = 0; i < 3; i++){
+        if(i === position){
+            scores.push(score);
+        } else {
+            scores.push(0);
+        }
+    }
+
+    req.dataRanking = { userName: userName, scores: scores };
+
+    next();
+};
+
 module.exports = {
     saveScore,
     verifyName
