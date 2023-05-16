@@ -43,10 +43,12 @@ function createMenu(menu, message, key) {
     spanA.innerHTML = "X";
     spanA.id = "spanA";
 
-    const divForm = menu.appendChild(document.createElement("div"));
-    if(key === "saveScore"){
-        menu.appendChild(document.createElement("span")).innerHTML = "Salve o seu score!";
+    key === "saveScore" ?menu.appendChild(document.createElement("span")).innerHTML = "Salve o seu score!" : null;
 
+    const divForm = menu.appendChild(document.createElement("div"));
+    divForm.classList.add("divForm");
+
+    if(key === "saveScore"){
         const inputName = divForm.appendChild(document.createElement("input"));
         inputName.type = "text";
         inputName.placeholder = "Digite o seu nome...";
@@ -337,7 +339,7 @@ class Board {
                 localStorage.score = JSON.stringify(maxScore);
                 document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore[positionBoard]}`;
 
-                createMenu.bind(this)(document.querySelector(".board").appendChild(document.createElement("div")), "Você perdeu", "saveScore");
+                createMenu.bind(this)(document.querySelector(".board").appendChild(document.createElement("div")), "Você perdeu!", "saveScore");
             } else if(
                 (maxScore[positionBoard] < this.score) &&
                 (result === false)

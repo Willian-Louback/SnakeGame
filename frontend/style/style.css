@@ -159,7 +159,7 @@ li {
     color: #8e0eff;
 }
 
-form {
+.divForm {
     display: flex;
     flex-direction: column;
     justify-content: center;
