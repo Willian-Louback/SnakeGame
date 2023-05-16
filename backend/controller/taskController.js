@@ -22,7 +22,7 @@ const getAllData = async (_req, res) => {
     try {
         const rankingList = await Ranking.find().sort({ score: -1 });
         const users = rankingList.map(user => ({ userName: user.userName, scores: user.scores }));
-        return res.status(200).json(users);
+        return res.status(200).json({ listRanking: users });
     } catch(error) {
         res.status(500).send({error: error.message});
     }
