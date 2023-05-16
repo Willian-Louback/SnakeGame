@@ -132,6 +132,8 @@ function createMenu(menu, message, key) {
 
             menu.remove();
 
+            loadInfo();
+
             setTimeout(() => {
                 board = new Board(columnBoard, lineBoard);
                 board.build();
