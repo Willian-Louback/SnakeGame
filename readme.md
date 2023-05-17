@@ -18,4 +18,5 @@ Divirtam-se e boa sorte!
 
 # Info
   A versão que foi disponibilizada para o pessoal testar: https://snakegamewillian.up.railway.app/  (Branch Main)
+  
   A versão mais recente está na branch develop. (Ainda falta alguns ajustes)
