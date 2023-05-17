@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    //const BASE_URL = "https://snakegamewillianback.up.railway.app";
-    const BASE_URL = "http://localhost:3100";
+    const BASE_URL = "https://snakegamewillianback.up.railway.app";
+    //const BASE_URL = "http://localhost:3100";
     const titleButton = document.querySelector(".titleButton");
     const changePosition = localStorage.changePosition || 1;
     localStorage.changeMode ? titleButton.innerHTML = `${localStorage.changeMode}<i class="bi bi-chevron-compact-down iconChoice" style="font-size: 17px;">` : titleButton.innerHTML = "Normal <i class=\"bi bi-chevron-compact-down iconChoice\" style=\"font-size: 17px;\">";
