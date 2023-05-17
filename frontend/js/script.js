@@ -324,7 +324,7 @@ function loadName() {
 function createMenu(menu, message, key, type = "") {
 
     const tryAgain = (target) => {
-        if((!target) || (target.key === "Enter")){
+        if((!target.key) || (target.key === "Enter")){
             document.removeEventListener("keydown", tryAgain);
             button.removeEventListener("click", tryAgain);
 
@@ -354,8 +354,60 @@ function createMenu(menu, message, key, type = "") {
         board.snakeManipulator.moveKeydown();
     };
 
+    const uploadRanking = (target) => {
+        if((!target.key) || (target.key === "Enter")){
+            document.removeEventListener("keydown", uploadRanking);
+            button.removeEventListener("click", uploadRanking);
+        } else {
+            return;
+        }
+
+        fetch(BASE_URL + "/saveScore", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ userName: inputName.value, score:  board.score, position: positionBoard })
+        })
+            .then(response => {
+                if(response.status === 201){
+                    return response.json();
+                } else if(response.status === 409) {
+                    delete localStorage.name;
+                    delete localStorage.id;
+                    delete localStorage.score;
+                    window.location.href = "/";
+                    alert("Esse nome já existe!");
+                } else{
+                    return null;
+                }
+            })
+            .then(data => {
+                if(data){
+                    localStorage.id = data.id;
+                    localStorage.name = data.name;
+                }
+            })
+            .catch(err => console.error(err));
+
+        button.addEventListener("click", uploadRanking);
+
+        button.disabled = true;
+        button.style.backgroundColor = "black";
+        button.style.color = "#8e0eff";
+
+        loadName();
+
+        if(type){
+            return closeMenu();
+        } else {
+            return tryAgain();
+        }
+    };
+
     const verifyName = () => {
         if(inputName.value.length >= 3 && inputName.value.length <= 10){
+            key === "saveScore" ? document.removeEventListener("keydown", uploadRanking) : null;
             button.disabled = true;
             button.style.backgroundColor = "black";
             button.style.color = "#8e0eff";
@@ -367,23 +419,24 @@ function createMenu(menu, message, key, type = "") {
 
                 data.listRanking.forEach(element => {
                     if(element.userName === inputName.value) {
-                        button.disabled = true;
                         verify = false;
-                        button.style.backgroundColor = "black";
-                        button.style.color = "#8e0eff";
                         return;
                     }
                 });
 
                 if(verify === true) {
-                    button.disabled = false;
-                    button.style.backgroundColor = "#8e0eff";
-                    button.style.color = "white";
+                    if(inputName.value.length >= 3 && inputName.value.length <= 10){ // Precisei reforçar a verificação pois estava bugando
+                        button.disabled = false;
+                        button.style.backgroundColor = "#8e0eff";
+                        button.style.color = "white";
+                        key === "saveScore" ? document.addEventListener("keydown", uploadRanking) : null;
+                    }
                 }
             };
 
             verifyN();
         } else {
+            key === "saveScore" ? document.removeEventListener("keydown", uploadRanking) : null;
             button.disabled = true;
             button.style.backgroundColor = "black";
             button.style.color = "#8e0eff";
@@ -426,57 +479,6 @@ function createMenu(menu, message, key, type = "") {
         button.name = "submitRanking";
         button.classList.add("buttonTryAgain");
 
-        const uploadRanking = (target) => {
-            if((!target.key) || (target.key === "Enter")){
-                document.removeEventListener("keydown", uploadRanking);
-                button.removeEventListener("click", uploadRanking);
-            } else {
-                return;
-            }
-
-            fetch(BASE_URL + "/saveScore", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ userName: inputName.value, score:  board.score, position: positionBoard })
-            })
-                .then(response => {
-                    if(response.status === 201){
-                        return response.json();
-                    } else if(response.status === 409) {
-                        delete localStorage.name;
-                        delete localStorage.id;
-                        delete localStorage.score;
-                        window.location.href = "/";
-                        alert("Esse nome já existe!");
-                    } else{
-                        return null;
-                    }
-                })
-                .then(data => {
-                    if(data){
-                        localStorage.id = data.id;
-                        localStorage.name = data.name;
-                    }
-                })
-                .catch(err => console.error(err));
-
-            button.disabled = true;
-            button.style.backgroundColor = "black";
-            button.style.color = "#8e0eff";
-
-            loadName();
-
-            if(type){
-                return closeMenu();
-            } else {
-                return tryAgain();
-            }
-        };
-
-        document.addEventListener("keydown", uploadRanking);
-        button.addEventListener("click", uploadRanking);
     } else if(key === "updateScore"){
         fetch(BASE_URL + "/updateScore", {
             method: "PATCH",
@@ -548,6 +550,7 @@ function createMenu(menu, message, key, type = "") {
                 })
                 .catch(err => console.error(err));
         });
+
     } else if(key === "switchColor"){
         const arrayColors = [
             "#8e0eff",
