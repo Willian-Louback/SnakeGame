@@ -324,7 +324,7 @@ function loadName() {
 function createMenu(menu, message, key, type = "") {
 
     const tryAgain = (target) => {
-        if((!target.key) || (target.key === " ") || (target.key === "Enter")){
+        if((!target) || (target.key === "Enter")){
             document.removeEventListener("keydown", tryAgain);
             button.removeEventListener("click", tryAgain);
 
