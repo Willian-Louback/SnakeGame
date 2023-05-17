@@ -9,7 +9,7 @@ const taskSchema = new mongoose.Schema({
         type: String,
         required: true
     }
-}, { collection: "Ranking" });
+}, { collection: "TesteDB" });
 
 module.exports = mongoose.model("Ranking", taskSchema);
 

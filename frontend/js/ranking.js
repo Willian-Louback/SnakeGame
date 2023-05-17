@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const BASE_URL = "https://snakegamewillianbackend.up.railway.app";
+    const BASE_URL = "https://snakegameback.vercel.app";
+    //const BASE_URL = "http://localhost:3100";
     const titleButton = document.querySelector(".titleButton");
     const changePosition = localStorage.changePosition || 1;
     localStorage.changeMode ? titleButton.innerHTML = `${localStorage.changeMode}<i class="bi bi-chevron-compact-down iconChoice" style="font-size: 17px;">` : titleButton.innerHTML = "Normal <i class=\"bi bi-chevron-compact-down iconChoice\" style=\"font-size: 17px;\">";
@@ -14,29 +15,32 @@ document.addEventListener("DOMContentLoaded", async () => {
             j++;
 
             const rankingLi = rankingUl.appendChild(document.createElement("li"));
-            rankingLi.classList.add("list");
-            i % 2 === 0 ? rankingLi.classList.add("black") : rankingLi.classList.add("gray");
+            rankingLi.classList.add("list", "colorLi");
             i === 0 ? rankingLi.classList.add("fixListFirst") : (i === 9) ? rankingLi.classList.add("fixListLast") : null;
             const spanName = rankingLi.appendChild(document.createElement("span"));
             spanName.classList.add("infoRanking");
             const spanScore = rankingLi.appendChild(document.createElement("span"));
             spanScore.classList.add("infoRanking");
 
-            if(data.listRanking[i].scores !== 0 && data.listRanking[i].scores){
+            if(data.listRanking.length && data.listRanking[i] && data.listRanking[i].scores && data.listRanking[i].scores !== 0){
                 return { spanName, spanScore };
             }
         }
 
         for(let i = 0; i < 10; i++){
-            if(data.listRanking[i].scores !== 0 && data.listRanking[i].scores){
+            if(!data.listRanking.length) {
+                break;
+            }
+
+            if(data.listRanking[i] && data.listRanking[i].scores && data.listRanking[i].scores !== 0){
                 const { spanName, spanScore } = createLi(i);
 
                 i === 0 ? spanName.innerHTML = `<i class="bi bi-trophy first"></i> ${data.listRanking[i].userName}`
                     : (i === 1) ? spanName.innerHTML = `<i class="bi bi-trophy second"></i> ${data.listRanking[i].userName}`
                         : (i === 2) ? spanName.innerHTML = `<i class="bi bi-trophy third"></i> ${data.listRanking[i].userName}`
-                            : spanName.innerHTML = ` ${data.listRanking[i].userName}`;
+                            : spanName.innerText = ` ${data.listRanking[i].userName}`;
 
-                spanScore.innerHTML = `Score: ${data.listRanking[i].scores}`;
+                spanScore.innerText = `Score: ${data.listRanking[i].scores}`;
             }
         }
 
@@ -84,14 +88,14 @@ const choiceRanking = () => {
     const menu = containerButtonChoice.appendChild(document.createElement("ul"));
     menu.classList.add("menuChoice");
     const easy = menu.appendChild(document.createElement("li"));
-    easy.innerHTML = "Easy";
-    easy.classList.add("liMenuChoice", "gray");
+    easy.innerText = "Easy";
+    easy.classList.add("liMenuChoice", "colorLi");
     const normal = menu.appendChild(document.createElement("li"));
-    normal.innerHTML = "Normal";
-    normal.classList.add("liMenuChoice", "black");
+    normal.innerText = "Normal";
+    normal.classList.add("liMenuChoice", "colorLi");
     const hard = menu.appendChild(document.createElement("li"));
-    hard.innerHTML = "Hard";
-    hard.classList.add("liMenuChoice", "gray", "fixLastHard");
+    hard.innerText = "Hard";
+    hard.classList.add("liMenuChoice", "colorLi", "fixLastHard");
 
     easy.onclick = () => {
         localStorage.changeMode = "Easy ";

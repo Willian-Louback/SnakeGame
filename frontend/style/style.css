@@ -13,15 +13,11 @@ main {
     height: 100vh;
 }
 
-.boardArea {
-    display: flex;
-    justify-content: center;
-}
-
 .board {
     position: relative;
     display: grid;
     margin-top: 20px;
+    margin: 0 auto;
     width: 516px;
     height: 500px;
     border: 0.5px solid #0eff3e;

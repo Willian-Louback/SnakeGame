@@ -4,196 +4,8 @@ let attemps = 0;
 let maxScore = localStorage.score ? JSON.parse(localStorage.score) : [0, 0, 0];
 let boardMode = localStorage.boardMode || "Normal";
 let positionBoard = localStorage.positionBoard || 1;
-const BASE_URL = "https://snakegamewillianbackend.up.railway.app";
-
-function loadInfo() {
-    localStorage.snakeColor ? document.documentElement.style.setProperty("--snakeColor", localStorage.snakeColor) : null;
-    const getName = document.querySelector("#getName");
-    const nameLi = document.querySelector(".nameLi");
-    getName.innerHTML = localStorage.name || "Anônimo";
-    !localStorage.name ? nameLi.style.cursor = "pointer" : nameLi.style.cursor = "default";
-}
-
-function createMenu(menu, message, key) {
-    menu.classList.add("menu");
-    menu.appendChild(document.createElement("span")).innerHTML = message;
-
-    const a = menu.appendChild(document.createElement("a"));
-    a.id = "aMenu";
-
-    a.addEventListener("click", () => {
-        document.querySelector("#score").innerHTML = `Score: 0`;
-        const food = document.querySelector(".food");
-        food ? food.classList.remove("food") : null;
-
-        document.querySelectorAll(".square").forEach(value => {
-            value.remove();
-        });
-
-        menu.remove();
-
-        setTimeout(() => {
-            board = new Board(columnBoard, lineBoard);
-            board.build();
-        }, 200);
-    });
-
-
-    const spanA = a.appendChild(document.createElement("span"));
-    spanA.innerHTML = "X";
-    spanA.id = "spanA";
-
-    key === "saveScore" ?menu.appendChild(document.createElement("span")).innerHTML = "Salve o seu score!" : null;
-
-    const divForm = menu.appendChild(document.createElement("div"));
-    divForm.classList.add("divForm");
-
-    if(key === "saveScore"){
-        const inputName = divForm.appendChild(document.createElement("input"));
-        inputName.type = "text";
-        inputName.placeholder = "Digite o seu nome...";
-        inputName.name = "userName";
-        inputName.classList.add("inputName");
-
-        inputName.addEventListener("input", () => {
-            if(inputName.value.length >= 3 && inputName.value.length <= 10){
-                button.disabled = true;
-                button.style.backgroundColor = "black";
-                button.style.color = "#8e0eff";
-
-                const verifyName = async () => {
-                    const reponse = await fetch(BASE_URL + "/getAllData");
-                    const data = await reponse.json();
-                    let verify = true;
-
-                    data.listRanking.forEach(element => {
-                        if(element.userName === inputName.value) {
-                            button.disabled = true;
-                            verify = false;
-                            button.style.backgroundColor = "black";
-                            button.style.color = "#8e0eff";
-                            return;
-                        }
-                    });
-
-                    if(verify === true) {
-                        button.disabled = false;
-                        button.style.backgroundColor = "#8e0eff";
-                        button.style.color = "white";
-                    }
-                };
-
-                verifyName();
-            } else {
-                button.disabled = true;
-                button.style.backgroundColor = "black";
-                button.style.color = "#8e0eff";
-            }
-        });
-
-        const button = divForm.appendChild(document.createElement("Button"));
-        button.innerHTML = "Salvar";
-        button.name = "submitRanking";
-        button.classList.add("buttonTryAgain");
-
-        button.addEventListener("click", () => {
-            button.disabled = true;
-            localStorage.name = inputName.value;
-            button.style.backgroundColor = "black";
-            button.style.color = "#8e0eff";
-            fetch(BASE_URL + "/saveScore", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ userName: inputName.value, score:  this.score, position: positionBoard })
-            })
-                .then(response => {
-                    if(response.status === 201){
-                        return response.json();
-                    } else {
-                        return null;
-                    }
-                })
-                .then(data => {
-                    if(data){
-                        localStorage.id = data.id;
-                    }
-                })
-                .catch(err => console.error(err));
-
-            document.querySelector("#score").innerHTML = `Score: 0`;
-            const food = document.querySelector(".food");
-            food ? food.classList.remove("food") : null;
-
-            document.querySelectorAll(".square").forEach(value => {
-                value.remove();
-            });
-
-            menu.remove();
-
-            loadInfo();
-
-            setTimeout(() => {
-                board = new Board(columnBoard, lineBoard);
-                board.build();
-            }, 200);
-        });
-    } else if(key === "updateScore"){
-        fetch(BASE_URL + "/updateScore", {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ id: localStorage.id, score:  this.score, position: positionBoard })
-        }).then(response => response.status === 200 ? console.log("Deu certo") : console.log("F"));
-
-        const button = divForm.appendChild(document.createElement("button"));
-        button.innerHTML = "Try Again";
-        button.name = "updateRanking";
-        button.classList.add("buttonTryAgain");
-
-        button.addEventListener("click", () => {
-            document.querySelector("#score").innerHTML = `Score: 0`;
-            const food = document.querySelector(".food");
-            food ? food.classList.remove("food") : null;
-
-            document.querySelectorAll(".square").forEach(value => {
-                value.remove();
-            });
-
-            menu.remove();
-
-            setTimeout(() => {
-                board = new Board(columnBoard, lineBoard);
-                board.build();
-            }, 200);
-        });
-    } else if(key === "lost"){
-        const button = divForm.appendChild(document.createElement("button"));
-        button.innerHTML = "Try Again";
-        button.classList.add("buttonTryAgain");
-
-        button.addEventListener("click", () => {
-            document.querySelector("#score").innerHTML = `Score: 0`;
-            const food = document.querySelector(".food");
-            food ? food.classList.remove("food") : null;
-
-            document.querySelectorAll(".square").forEach(value => {
-                value.remove();
-            });
-
-            menu.remove();
-
-            setTimeout(() => {
-                board = new Board(columnBoard, lineBoard);
-                board.build();
-            }, 200);
-        });
-    }
-}
-
-loadInfo();
+const BASE_URL = "https://snakegameback.vercel.app";
+//const BASE_URL = "http://localhost:3100";
 
 class Board {
     constructor(column, line){
@@ -217,7 +29,7 @@ class Board {
 
 
     build(){
-        document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore[positionBoard]}`;
+        document.querySelector("#maxScore").innerText = `Melhor Score: ${maxScore[positionBoard]}`;
         const boardMain = document.querySelector(".board");
         boardMain.style.gridTemplateColumns = `repeat(${this.column}, 1fr)`;
         boardMain.style.gridTemplateRows = `repeat(${this.line}, 1fr)`;
@@ -300,7 +112,7 @@ class Board {
 
     calculateScore(){
         this.score += 10;
-        document.querySelector("#score").innerHTML = `Score: ${this.score}`;
+        document.querySelector("#score").innerText = `Score: ${this.score}`;
     }
 
     generateFood(){
@@ -321,26 +133,6 @@ class Board {
         this.stop = true;
         clearInterval(this.setIntervalID);
 
-        function tryAgainF(target){
-            if((target.key === " ") || (target.key === "Enter")){
-                document.removeEventListener("keydown", tryAgainF);
-                document.querySelector("#score").innerHTML = `Score: 0`;
-                const food = document.querySelector(".food");
-                food ? food.classList.remove("food") : null;
-
-                document.querySelectorAll(".square").forEach(value => {
-                    value.remove();
-                });
-
-                board.menu.remove();
-
-                setTimeout(() => {
-                    board = new Board(columnBoard, lineBoard);
-                    board.build();
-                }, 200);
-            }
-        }
-
         const verifyDB = async () => {
             if(localStorage.name){
                 return false;
@@ -355,7 +147,7 @@ class Board {
             if(result === true){
                 maxScore[positionBoard] = this.score;
                 localStorage.score = JSON.stringify(maxScore);
-                document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore[positionBoard]}`;
+                document.querySelector("#maxScore").innerText = `Melhor Score: ${maxScore[positionBoard]}`;
 
                 createMenu.bind(this)(document.querySelector(".board").appendChild(document.createElement("div")), "Você perdeu!", "saveScore");
             } else if(
@@ -364,7 +156,7 @@ class Board {
             ){
                 maxScore[positionBoard] = this.score;
                 localStorage.score = JSON.stringify(maxScore);
-                document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore[positionBoard]}`;
+                document.querySelector("#maxScore").innerText = `Melhor Score: ${maxScore[positionBoard]}`;
 
                 createMenu.bind(this)(document.querySelector(".board").appendChild(document.createElement("div")), "New Record!", "updateScore");
             } else {
@@ -393,13 +185,13 @@ class Board {
             if(result === true){
                 maxScore[positionBoard] = this.score;
                 localStorage.score = JSON.stringify(maxScore);
-                document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore[positionBoard]}`;
+                document.querySelector("#maxScore").innerText = `Melhor Score: ${maxScore[positionBoard]}`;
 
                 createMenu.bind(this)(document.querySelector(".board").appendChild(document.createElement("div")), "Você Venceu!", "saveScore");
             } else {
                 maxScore[positionBoard] = this.score;
                 localStorage.score = JSON.stringify(maxScore);
-                document.querySelector("#maxScore").innerHTML = `Melhor Score: ${maxScore[positionBoard]}`;
+                document.querySelector("#maxScore").innerText = `Melhor Score: ${maxScore[positionBoard]}`;
 
                 createMenu.bind(this)(document.querySelector(".board").appendChild(document.createElement("div")), "Você venceu!", "updateScore");
             }
@@ -433,7 +225,7 @@ class Snake {
             }
         } else {
             attemps++;
-            document.querySelector("#attemps").innerHTML = `Tentativas: ${attemps}`;
+            document.querySelector("#attemps").innerText = `Tentativas: ${attemps}`;
             this.firstTime = false;
         }
 
@@ -480,7 +272,7 @@ class Snake {
                 }
             } else {
                 attemps++;
-                document.querySelector("#attemps").innerHTML = `Tentativas: ${attemps}`;
+                document.querySelector("#attemps").innerText = `Tentativas: ${attemps}`;
                 this.firstTime = false;
             }
 
@@ -521,9 +313,188 @@ class Cell {
     }
 }
 
-let board = new Board(columnBoard, lineBoard);
+function loadName() {
+    localStorage.snakeColor ? document.documentElement.style.setProperty("--snakeColor", localStorage.snakeColor) : null;
+    const getName = document.querySelector("#getName");
+    const nameLi = document.querySelector(".nameLi");
+    getName.innerText = localStorage.name || "Anônimo";
+    !localStorage.name ? nameLi.style.cursor = "pointer" : nameLi.style.cursor = "default";
+}
 
-board.build();
+function createMenu(menu, message, key) {
+    menu.classList.add("menu");
+    menu.appendChild(document.createElement("span")).innerText = message;
+
+    const a = menu.appendChild(document.createElement("a"));
+    a.id = "aMenu";
+
+    a.addEventListener("click", () => {
+        document.querySelector("#score").innerText = `Score: 0`;
+        const food = document.querySelector(".food");
+        food ? food.classList.remove("food") : null;
+
+        document.querySelectorAll(".square").forEach(value => {
+            value.remove();
+        });
+
+        menu.remove();
+
+        setTimeout(() => {
+            board = new Board(columnBoard, lineBoard);
+            board.build();
+        }, 200);
+    });
+
+
+    const spanA = a.appendChild(document.createElement("span"));
+    spanA.innerText = "X";
+    spanA.id = "spanA";
+
+    key === "saveScore" ?menu.appendChild(document.createElement("span")).innerText = "Salve o seu score!" : null;
+
+    const divForm = menu.appendChild(document.createElement("div"));
+    divForm.classList.add("divForm");
+
+    const button = divForm.appendChild(document.createElement("button"));
+
+    const tryAgain = (target) => {
+        if((!target.key) || (target.key === " ") || (target.key === "Enter")){
+            document.removeEventListener("keydown", tryAgain);
+            button.removeEventListener("click", tryAgain);
+            document.querySelector("#score").innerText = `Score: 0`;
+            const food = document.querySelector(".food");
+            food ? food.classList.remove("food") : null;
+
+            document.querySelectorAll(".square").forEach(value => {
+                value.remove();
+            });
+
+            menu.remove();
+
+            setTimeout(() => {
+                board = new Board(columnBoard, lineBoard);
+                board.build();
+            }, 200);
+        }
+    };
+
+    if(key === "saveScore"){
+        const inputName = divForm.appendChild(document.createElement("input"));
+        inputName.type = "text";
+        inputName.placeholder = "Digite o seu nome...";
+        inputName.name = "userName";
+        inputName.classList.add("inputName");
+
+        inputName.addEventListener("input", () => {
+            if(inputName.value.length >= 3 && inputName.value.length <= 10){
+                button.disabled = true;
+                button.style.backgroundColor = "black";
+                button.style.color = "#8e0eff";
+
+                const verifyName = async () => {
+                    const reponse = await fetch(BASE_URL + "/getAllData");
+                    const data = await reponse.json();
+                    let verify = true;
+
+                    data.listRanking.forEach(element => {
+                        if(element.userName === inputName.value) {
+                            button.disabled = true;
+                            verify = false;
+                            button.style.backgroundColor = "black";
+                            button.style.color = "#8e0eff";
+                            return;
+                        }
+                    });
+
+                    if(verify === true) {
+                        button.disabled = false;
+                        button.style.backgroundColor = "#8e0eff";
+                        button.style.color = "white";
+                    }
+                };
+
+                verifyName();
+            } else {
+                button.disabled = true;
+                button.style.backgroundColor = "black";
+                button.style.color = "#8e0eff";
+            }
+        });
+
+        button.innerText = "Salvar";
+        button.name = "submitRanking";
+        button.classList.add("buttonTryAgain");
+
+        button.addEventListener("click", () => {
+            button.disabled = true;
+            localStorage.name = inputName.value;
+            button.style.backgroundColor = "black";
+            button.style.color = "#8e0eff";
+            fetch(BASE_URL + "/saveScore", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ userName: inputName.value, score:  this.score, position: positionBoard })
+            })
+                .then(response => {
+                    if(response.status === 201){
+                        return response.json();
+                    } else if(response.status === 409) {
+                        delete localStorage.name;
+                        alert("Esse nome já existe!");
+                    } else{
+                        return null;
+                    }
+                })
+                .then(data => {
+                    if(data){
+                        localStorage.id = data.id;
+                    }
+                })
+                .catch(err => console.error(err));
+
+            document.querySelector("#score").innerText = `Score: 0`;
+            const food = document.querySelector(".food");
+            food ? food.classList.remove("food") : null;
+
+            document.querySelectorAll(".square").forEach(value => {
+                value.remove();
+            });
+
+            menu.remove();
+
+            loadName();
+
+            setTimeout(() => {
+                board = new Board(columnBoard, lineBoard);
+                board.build();
+            }, 200);
+        });
+    } else if(key === "updateScore"){
+        fetch(BASE_URL + "/updateScore", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id: localStorage.id, score:  this.score, position: positionBoard })
+        }).then(_response => null)
+            .catch(err => console.error(err));
+
+        button.innerText = "Try Again";
+        button.name = "updateRanking";
+        button.classList.add("buttonTryAgain");
+
+        document.addEventListener("keydown", tryAgain);
+        button.addEventListener("click", tryAgain);
+    } else if(key === "lost"){
+        button.innerText = "Try Again";
+        button.classList.add("buttonTryAgain");
+
+        document.addEventListener("keydown", tryAgain);
+        button.addEventListener("click", tryAgain);
+    }
+}
 
 const menuClick = () => {
     const menuItens = document.querySelector("#menuItens");
@@ -561,10 +532,10 @@ const updateName = () => {
     a.style.color ="#8e0eff";
 
     const spanA = a.appendChild(document.createElement("span"));
-    spanA.innerHTML = "X";
+    spanA.innerText = "X";
     spanA.id = "spanA";
 
-    menu.appendChild(document.createElement("span")).innerHTML = "Mudar Nome";
+    menu.appendChild(document.createElement("span")).innerText = "Mudar Nome";
 
     const form = menu.appendChild(document.createElement("form"));
     form.method = "POST";
@@ -648,20 +619,20 @@ const snakeColor = () => {
     menu.classList.add("menu");
 
     const spanA = menu.appendChild(document.createElement("span"));
-    spanA.innerHTML = "X";
+    spanA.innerText = "X";
     spanA.id = "spanA";
     spanA.style.position = "absolute";
     spanA.style.top = "15px";
     spanA.style.right = "15px";
     spanA.onclick = () => menu.remove();
 
-    menu.appendChild(document.createElement("span")).innerHTML = "Mudar Cor";
+    menu.appendChild(document.createElement("span")).innerText = "Mudar Cor";
 
     const divChoiceColor = menu.appendChild(document.createElement("div"));
     divChoiceColor.classList.add("divChoiceColor");
 
     const buttonLeftColor = divChoiceColor.appendChild(document.createElement("button"));
-    buttonLeftColor.innerHTML = "<-";
+    buttonLeftColor.innerText = "<-";
     buttonLeftColor.classList.add("buttonChoiceColor");
 
     const colorExample = divChoiceColor.appendChild(document.createElement("div"));
@@ -669,11 +640,11 @@ const snakeColor = () => {
     colorExample.style.backgroundColor = arrayColors[positionColor];
 
     const buttonRightColor = divChoiceColor.appendChild(document.createElement("button"));
-    buttonRightColor.innerHTML = "->";
+    buttonRightColor.innerText = "->";
     buttonRightColor.classList.add("buttonChoiceColor");
 
     const buttonSave = menu.appendChild(document.createElement("button"));
-    buttonSave.innerHTML = "Salvar";
+    buttonSave.innerText = "Salvar";
     buttonSave.classList.add("buttonTryAgain");
 
     buttonLeftColor.onclick = () => {
@@ -727,10 +698,10 @@ const createAccount = () => {
     a.style.color ="#8e0eff";
 
     const spanA = a.appendChild(document.createElement("span"));
-    spanA.innerHTML = "X";
+    spanA.innerText = "X";
     spanA.id = "spanA";
 
-    menu.appendChild(document.createElement("span")).innerHTML = "Cadastrar User";
+    menu.appendChild(document.createElement("span")).innerText = "Cadastrar User";
 
     const form = menu.appendChild(document.createElement("form"));
     form.method = "POST";
@@ -798,6 +769,7 @@ const createAccount = () => {
         form.submit();
     });
 };
+
 const getBoard = () => {
     const arrayBoard = [
         [6, 6, "Easy"],
@@ -816,34 +788,34 @@ const getBoard = () => {
     menu.classList.add("menu");
 
     const spanA = menu.appendChild(document.createElement("span"));
-    spanA.innerHTML = "X";
+    spanA.innerText = "X";
     spanA.id = "spanA";
     spanA.style.position = "absolute";
     spanA.style.top = "15px";
     spanA.style.right = "15px";
     spanA.onclick = () => menu.remove();
 
-    menu.appendChild(document.createElement("span")).innerHTML = "Mudar Tamanho";
+    menu.appendChild(document.createElement("span")).innerText = "Mudar Tamanho";
 
     const divChoiceBoard = menu.appendChild(document.createElement("div"));
     divChoiceBoard.classList.add("divChoiceBoard");
 
     const buttonLeftBoard = divChoiceBoard.appendChild(document.createElement("button"));
-    buttonLeftBoard.innerHTML = "<-";
+    buttonLeftBoard.innerText = "<-";
     buttonLeftBoard.classList.add("buttonChoiceBoard");
 
     const boardHW = divChoiceBoard.appendChild(document.createElement("div"));
     boardHW.classList.add("boardHW");
     const spanBoard = boardHW.appendChild(document.createElement("span"));
-    spanBoard.innerHTML = arrayBoard[positionBoard][2];
+    spanBoard.innerText = arrayBoard[positionBoard][2];
     spanBoard.id = "spanBoard";
 
     const buttonRightBoard = divChoiceBoard.appendChild(document.createElement("button"));
-    buttonRightBoard.innerHTML = "->";
+    buttonRightBoard.innerText = "->";
     buttonRightBoard.classList.add("buttonChoiceBoard");
 
     const buttonSave = menu.appendChild(document.createElement("button"));
-    buttonSave.innerHTML = "Salvar";
+    buttonSave.innerText = "Salvar";
     buttonSave.classList.add("buttonTryAgain");
 
     buttonLeftBoard.onclick = () => {
@@ -853,7 +825,7 @@ const getBoard = () => {
             positionBoard = arrayBoard.length - 1;
         }
 
-        spanBoard.innerHTML = arrayBoard[positionBoard][2];
+        spanBoard.innerText = arrayBoard[positionBoard][2];
     };
 
     buttonRightBoard.onclick = () => {
@@ -863,7 +835,7 @@ const getBoard = () => {
             positionBoard = 0;
         }
 
-        spanBoard.innerHTML = arrayBoard[positionBoard][2];
+        spanBoard.innerText = arrayBoard[positionBoard][2];
     };
 
 
@@ -875,3 +847,9 @@ const getBoard = () => {
         window.location.href = "/";
     };
 };
+
+loadName();
+
+let board = new Board(columnBoard, lineBoard);
+
+board.build();

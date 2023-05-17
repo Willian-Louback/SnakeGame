@@ -32,7 +32,7 @@ const saveScore = async (req, res, next) => {
     }
 
     for(let i = 0; i < 3; i++){
-        if(i === position){
+        if(i == position){
             scores.push(score);
         } else {
             scores.push(0);

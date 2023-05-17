@@ -10,8 +10,11 @@ const renderRanking = (_req, res) => {
 
 const getData = async (req, res) => {
     try {
-        const listRanking = await Ranking.find().sort({ scores: -1 }).limit(10);
-        const users = listRanking.map(user => ({ userName: user.userName, scores: user.scores[req.params.position] }));
+        const listRanking = await Ranking.find();
+        const users = listRanking.map(user => ({ userName: user.userName, scores: user.scores[req.params.position] }))
+            .sort((a, b) => b.scores - a.scores) // Se der positivo o "B" fica no topo, se for negativo o "A" fica no topo;
+            .slice(0, 10);
+
         return res.status(200).json({ listRanking: users });
     } catch(error) {
         res.status(500).send({error: error.message});
@@ -56,7 +59,7 @@ const updateScore = async (req, res) => {
     const rankingFind = await Ranking.findOne({ _id: id });
 
     const newScore = rankingFind.scores.map((element, indice) => {
-        if(indice === position) {
+        if(indice == position) {
             return score;
         } else {
             return element;

@@ -11,7 +11,7 @@ const routes = require("./routes/routes");
 connectToDb();
 
 app.use(cors({
-    origin: "https://snakegamewillian.netlify.app"
+    origin: process.env.BASE_URL
 }));
 
 app.use(express.urlencoded({ extended: true })); // Para receber o que vier de um form
