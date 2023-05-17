@@ -8,6 +8,6 @@ routes.get("/getData/:position", TaskController.getData);
 routes.get("/getAllData", TaskController.getAllData);
 routes.post("/saveScore", MiddlewareController.verifyName, MiddlewareController.saveScore, TaskController.saveScore);
 routes.patch("/updateScore", TaskController.updateScore);
-routes.patch("/updateName/:userName/:newUserName", MiddlewareController.verifyName, TaskController.updateName);
+routes.patch("/updateName", MiddlewareController.verifyName, TaskController.updateName);
 
 module.exports = routes;

@@ -4,8 +4,8 @@ let attemps = 0;
 let maxScore = localStorage.score ? JSON.parse(localStorage.score) : [0, 0, 0];
 let boardMode = localStorage.boardMode || "Normal";
 let positionBoard = localStorage.positionBoard || 1;
-const BASE_URL = "https://snakegamewillianback.up.railway.app";
-//const BASE_URL = "http://localhost:3100";
+//const BASE_URL = "https://snakegamewillianback.up.railway.app";
+const BASE_URL = "http://localhost:3100";
 
 class Board {
     constructor(column, line){
@@ -134,7 +134,7 @@ class Board {
         clearInterval(this.setIntervalID);
 
         const verifyDB = async () => {
-            if(localStorage.name){
+            if(localStorage.id){
                 return false;
             }
 
@@ -149,7 +149,7 @@ class Board {
                 localStorage.score = JSON.stringify(maxScore);
                 document.querySelector("#maxScore").innerText = `Melhor Score: ${maxScore[positionBoard]}`;
 
-                createMenu.bind(this)(document.querySelector(".board").appendChild(document.createElement("div")), "Você perdeu!", "saveScore");
+                createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "Você perdeu!", "saveScore");
             } else if(
                 (maxScore[positionBoard] < this.score) &&
                 (result === false)
@@ -158,9 +158,9 @@ class Board {
                 localStorage.score = JSON.stringify(maxScore);
                 document.querySelector("#maxScore").innerText = `Melhor Score: ${maxScore[positionBoard]}`;
 
-                createMenu.bind(this)(document.querySelector(".board").appendChild(document.createElement("div")), "New Record!", "updateScore");
+                createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "New Record!", "updateScore");
             } else {
-                createMenu.bind(this)(document.querySelector(".board").appendChild(document.createElement("div")), "Você perdeu!", "lost");
+                createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "Você perdeu!", "lost");
             }
         };
 
@@ -172,7 +172,7 @@ class Board {
         clearInterval(this.setIntervalID);
 
         const verifyDB = async () => {
-            if(localStorage.name){
+            if(localStorage.id){
                 return false;
             }
 
@@ -187,13 +187,13 @@ class Board {
                 localStorage.score = JSON.stringify(maxScore);
                 document.querySelector("#maxScore").innerText = `Melhor Score: ${maxScore[positionBoard]}`;
 
-                createMenu.bind(this)(document.querySelector(".board").appendChild(document.createElement("div")), "Você Venceu!", "saveScore");
+                createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "Você Venceu!", "saveScore");
             } else {
                 maxScore[positionBoard] = this.score;
                 localStorage.score = JSON.stringify(maxScore);
                 document.querySelector("#maxScore").innerText = `Melhor Score: ${maxScore[positionBoard]}`;
 
-                createMenu.bind(this)(document.querySelector(".board").appendChild(document.createElement("div")), "Você venceu!", "updateScore");
+                createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "Você venceu!", "updateScore");
             }
         };
 
@@ -321,46 +321,15 @@ function loadName() {
     !localStorage.name ? nameLi.style.cursor = "pointer" : nameLi.style.cursor = "default";
 }
 
-function createMenu(menu, message, key) {
-    menu.classList.add("menu");
-    menu.appendChild(document.createElement("span")).innerText = message;
-
-    const a = menu.appendChild(document.createElement("a"));
-    a.id = "aMenu";
-
-    a.addEventListener("click", () => {
-        document.querySelector("#score").innerText = `Score: 0`;
-        const food = document.querySelector(".food");
-        food ? food.classList.remove("food") : null;
-
-        document.querySelectorAll(".square").forEach(value => {
-            value.remove();
-        });
-
-        menu.remove();
-
-        setTimeout(() => {
-            board = new Board(columnBoard, lineBoard);
-            board.build();
-        }, 200);
-    });
-
-
-    const spanA = a.appendChild(document.createElement("span"));
-    spanA.innerText = "X";
-    spanA.id = "spanA";
-
-    key === "saveScore" ?menu.appendChild(document.createElement("span")).innerText = "Salve o seu score!" : null;
-
-    const divForm = menu.appendChild(document.createElement("div"));
-    divForm.classList.add("divForm");
-
-    const button = divForm.appendChild(document.createElement("button"));
+function createMenu(menu, message, key, type = "") {
 
     const tryAgain = (target) => {
         if((!target.key) || (target.key === " ") || (target.key === "Enter")){
             document.removeEventListener("keydown", tryAgain);
             button.removeEventListener("click", tryAgain);
+
+            a.removeEventListener("click", tryAgain);
+
             document.querySelector("#score").innerText = `Score: 0`;
             const food = document.querySelector(".food");
             food ? food.classList.remove("food") : null;
@@ -378,70 +347,108 @@ function createMenu(menu, message, key) {
         }
     };
 
+    const closeMenu = () => {
+        a.removeEventListener("click", tryAgain);
+        menu.remove();
+        board.stop = false;
+        board.snakeManipulator.moveKeydown();
+    };
+
+    const verifyName = () => {
+        if(inputName.value.length >= 3 && inputName.value.length <= 10){
+            button.disabled = true;
+            button.style.backgroundColor = "black";
+            button.style.color = "#8e0eff";
+
+            const verifyN = async () => {
+                const reponse = await fetch(BASE_URL + "/getAllData");
+                const data = await reponse.json();
+                let verify = true;
+
+                data.listRanking.forEach(element => {
+                    if(element.userName === inputName.value) {
+                        button.disabled = true;
+                        verify = false;
+                        button.style.backgroundColor = "black";
+                        button.style.color = "#8e0eff";
+                        return;
+                    }
+                });
+
+                if(verify === true) {
+                    button.disabled = false;
+                    button.style.backgroundColor = "#8e0eff";
+                    button.style.color = "white";
+                }
+            };
+
+            verifyN();
+        } else {
+            button.disabled = true;
+            button.style.backgroundColor = "black";
+            button.style.color = "#8e0eff";
+        }
+    };
+
+    menu.classList.add("menu");
+    menu.appendChild(document.createElement("span")).innerText = message;
+
+    const a = menu.appendChild(document.createElement("a"));
+    a.id = "aMenu";
+
+    !type ? a.addEventListener("click", tryAgain) : a.addEventListener("click", closeMenu);
+
+    const spanA = a.appendChild(document.createElement("span"));
+    spanA.innerText = "X";
+    spanA.id = "spanA";
+
+    key === "saveScore" ? menu.appendChild(document.createElement("span")).innerText = "Salve o seu score!" : null;
+
+    const divForm = document.createElement("div");
+    divForm.classList.add("divForm");
+
+    const button = document.createElement("button");
+    const inputName = document.createElement("input");
+
     if(key === "saveScore"){
-        const inputName = divForm.appendChild(document.createElement("input"));
+        menu.appendChild(divForm);
+
+        divForm.appendChild(inputName);
         inputName.type = "text";
         inputName.placeholder = "Digite o seu nome...";
         inputName.name = "userName";
         inputName.classList.add("inputName");
 
-        inputName.addEventListener("input", () => {
-            if(inputName.value.length >= 3 && inputName.value.length <= 10){
-                button.disabled = true;
-                button.style.backgroundColor = "black";
-                button.style.color = "#8e0eff";
+        inputName.addEventListener("input", verifyName);
 
-                const verifyName = async () => {
-                    const reponse = await fetch(BASE_URL + "/getAllData");
-                    const data = await reponse.json();
-                    let verify = true;
-
-                    data.listRanking.forEach(element => {
-                        if(element.userName === inputName.value) {
-                            button.disabled = true;
-                            verify = false;
-                            button.style.backgroundColor = "black";
-                            button.style.color = "#8e0eff";
-                            return;
-                        }
-                    });
-
-                    if(verify === true) {
-                        button.disabled = false;
-                        button.style.backgroundColor = "#8e0eff";
-                        button.style.color = "white";
-                    }
-                };
-
-                verifyName();
-            } else {
-                button.disabled = true;
-                button.style.backgroundColor = "black";
-                button.style.color = "#8e0eff";
-            }
-        });
-
+        divForm.appendChild(button);
         button.innerText = "Salvar";
         button.name = "submitRanking";
         button.classList.add("buttonTryAgain");
 
-        button.addEventListener("click", () => {
-            button.disabled = true;
-            localStorage.name = inputName.value;
-            button.style.backgroundColor = "black";
-            button.style.color = "#8e0eff";
+        const uploadRanking = (target) => {
+            if((!target.key) || (target.key === "Enter")){
+                document.removeEventListener("keydown", uploadRanking);
+                button.removeEventListener("click", uploadRanking);
+            } else {
+                return;
+            }
+
             fetch(BASE_URL + "/saveScore", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ userName: inputName.value, score:  this.score, position: positionBoard })
+                body: JSON.stringify({ userName: inputName.value, score:  board.score, position: positionBoard })
             })
                 .then(response => {
                     if(response.status === 201){
                         return response.json();
                     } else if(response.status === 409) {
                         delete localStorage.name;
+                        delete localStorage.id;
+                        delete localStorage.score;
+                        window.location.href = "/";
                         alert("Esse nome já existe!");
                     } else{
                         return null;
@@ -450,37 +457,39 @@ function createMenu(menu, message, key) {
                 .then(data => {
                     if(data){
                         localStorage.id = data.id;
+                        localStorage.name = data.name;
                     }
                 })
                 .catch(err => console.error(err));
 
-            document.querySelector("#score").innerText = `Score: 0`;
-            const food = document.querySelector(".food");
-            food ? food.classList.remove("food") : null;
-
-            document.querySelectorAll(".square").forEach(value => {
-                value.remove();
-            });
-
-            menu.remove();
+            button.disabled = true;
+            button.style.backgroundColor = "black";
+            button.style.color = "#8e0eff";
 
             loadName();
 
-            setTimeout(() => {
-                board = new Board(columnBoard, lineBoard);
-                board.build();
-            }, 200);
-        });
+            if(type){
+                return closeMenu();
+            } else {
+                return tryAgain();
+            }
+        };
+
+        document.addEventListener("keydown", uploadRanking);
+        button.addEventListener("click", uploadRanking);
     } else if(key === "updateScore"){
         fetch(BASE_URL + "/updateScore", {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ id: localStorage.id, score:  this.score, position: positionBoard })
+            body: JSON.stringify({ id: localStorage.id, score:  board.score, position: positionBoard })
         }).then(_response => null)
             .catch(err => console.error(err));
 
+        menu.appendChild(divForm);
+
+        divForm.appendChild(button);
         button.innerText = "Try Again";
         button.name = "updateRanking";
         button.classList.add("buttonTryAgain");
@@ -488,11 +497,174 @@ function createMenu(menu, message, key) {
         document.addEventListener("keydown", tryAgain);
         button.addEventListener("click", tryAgain);
     } else if(key === "lost"){
+        menu.appendChild(divForm);
+
+        divForm.appendChild(button);
         button.innerText = "Try Again";
         button.classList.add("buttonTryAgain");
 
         document.addEventListener("keydown", tryAgain);
         button.addEventListener("click", tryAgain);
+    } else if(key === "newName"){
+        menu.appendChild(divForm);
+
+        divForm.appendChild(inputName);
+        inputName.type = "text";
+        inputName.placeholder = "Digite o seu nome...";
+        inputName.name = "userName";
+        inputName.classList.add("inputName");
+        inputName.focus();
+
+        divForm.appendChild(button);
+        button.innerText = "Salvar";
+        button.classList.add("buttonTryAgain");
+
+        inputName.addEventListener("input", verifyName);
+
+        button.addEventListener("click", () => {
+            button.disabled = true;
+            fetch(BASE_URL + "/updateName/",{
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ id: localStorage.id, userName: inputName.value })
+            })
+                .then(response => {
+                    if(response.ok){
+                        return response.json();
+                    } else if(response.status === 409) {
+                        window.location.href = "/";
+                        alert("Esse nome já existe!");
+                    } else {
+                        return null;
+                    }
+                })
+                .then(data => {
+                    localStorage.name = data.name;
+                    loadName();
+                    closeMenu();
+                    alert("Nome atualizado com sucesso!");
+                })
+                .catch(err => console.error(err));
+        });
+    } else if(key === "switchColor"){
+        const arrayColors = [
+            "#8e0eff",
+            "red",
+            "#33ff00",
+            "white",
+            "blue",
+            "#ff00bb"
+        ];
+
+        let positionColor = localStorage.positionColor || 0;
+
+        const divChoiceColor = menu.appendChild(document.createElement("div"));
+        divChoiceColor.classList.add("divChoiceColor");
+
+        const buttonLeftColor = divChoiceColor.appendChild(document.createElement("button"));
+        buttonLeftColor.innerText = "<-";
+        buttonLeftColor.classList.add("buttonChoiceColor");
+
+        const colorExample = divChoiceColor.appendChild(document.createElement("div"));
+        colorExample.classList.add("colorExample");
+        colorExample.style.backgroundColor = arrayColors[positionColor];
+
+        const buttonRightColor = divChoiceColor.appendChild(document.createElement("button"));
+        buttonRightColor.innerText = "->";
+        buttonRightColor.classList.add("buttonChoiceColor");
+
+        menu.appendChild(button);
+        button.innerText = "Salvar";
+        button.classList.add("buttonTryAgain");
+
+        buttonLeftColor.onclick = () => {
+            if(positionColor != 0){
+                positionColor--;
+            } else {
+                positionColor = arrayColors.length - 1;
+            }
+
+            colorExample.style.backgroundColor = arrayColors[positionColor];
+        };
+
+        buttonRightColor.onclick = () => {
+            if(positionColor != arrayColors.length - 1){
+                positionColor++;
+            } else {
+                positionColor = 0;
+            }
+
+            colorExample.style.backgroundColor = arrayColors[positionColor];
+        };
+
+
+        button.onclick = () => {
+            localStorage.positionColor = positionColor;
+            localStorage.snakeColor = arrayColors[positionColor];
+            document.documentElement.style.setProperty("--snakeColor", arrayColors[positionColor]);
+
+            closeMenu();
+        };
+    } else if(key === "getBoard") {
+        const arrayBoard = [
+            [6, 6, "Easy"],
+            [10, 10, "Normal"],
+            [15, 15, "Hard"]
+        ];
+
+        let positionBoard = localStorage.positionBoard || 1;
+
+        const divChoiceBoard = menu.appendChild(document.createElement("div"));
+        divChoiceBoard.classList.add("divChoiceBoard");
+
+        const buttonLeftBoard = divChoiceBoard.appendChild(document.createElement("button"));
+        buttonLeftBoard.innerText = "<-";
+        buttonLeftBoard.classList.add("buttonChoiceBoard");
+
+        const boardHW = divChoiceBoard.appendChild(document.createElement("div"));
+        boardHW.classList.add("boardHW");
+        const spanBoard = boardHW.appendChild(document.createElement("span"));
+        spanBoard.innerText = arrayBoard[positionBoard][2];
+        spanBoard.id = "spanBoard";
+
+        const buttonRightBoard = divChoiceBoard.appendChild(document.createElement("button"));
+        buttonRightBoard.innerText = "->";
+        buttonRightBoard.classList.add("buttonChoiceBoard");
+
+        menu.appendChild(button);
+        button.innerText = "Salvar";
+        button.classList.add("buttonTryAgain");
+
+        buttonLeftBoard.onclick = () => {
+            if(positionBoard != 0){
+                positionBoard--;
+            } else {
+                positionBoard = arrayBoard.length - 1;
+            }
+
+            spanBoard.innerText = arrayBoard[positionBoard][2];
+        };
+
+        buttonRightBoard.onclick = () => {
+            if(positionBoard != arrayBoard.length - 1){
+                positionBoard++;
+            } else {
+                positionBoard = 0;
+            }
+
+            spanBoard.innerText = arrayBoard[positionBoard][2];
+        };
+
+
+        button.onclick = () => {
+            localStorage.positionBoard = positionBoard;
+            localStorage.boardHeight = arrayBoard[positionBoard][0];
+            localStorage.boardWidth = arrayBoard[positionBoard][1];
+
+            window.location.href = "";
+        };
     }
 }
 
@@ -522,159 +694,18 @@ const updateName = () => {
     menuItens.style.display = "none";
     document.querySelector("#menuHamburguerSpan").style.color = "black";
 
-    const menu = document.querySelector(".board").appendChild(document.createElement("div"));
-    menu.classList.add("menu");
-
-    const a = menu.appendChild(document.createElement("a"));
-    a.id = "aMenu";
-    a.href = "/";
-    a.style.textDecoration = "none";
-    a.style.color ="#8e0eff";
-
-    const spanA = a.appendChild(document.createElement("span"));
-    spanA.innerText = "X";
-    spanA.id = "spanA";
-
-    menu.appendChild(document.createElement("span")).innerText = "Mudar Nome";
-
-    const form = menu.appendChild(document.createElement("form"));
-    form.method = "POST";
-
-    const inputName = form.appendChild(document.createElement("input"));
-    inputName.type = "text";
-    inputName.placeholder = "Digite o nome...";
-    inputName.name = "userName";
-    inputName.classList.add("inputName");
-    inputName.focus();
-
-    inputName.addEventListener("input", () => {
-        if(inputName.value.length >= 3 && inputName.value.length <= 10){
-            button.disabled = true;
-            button.style.backgroundColor = "black";
-            button.style.color = "#8e0eff";
-
-            const verifyName = async () => {
-                const reponse = await fetch(BASE_URL + "/getAllData");
-                const data = await reponse.json();
-                let verify = true;
-
-                data.listRanking.forEach(element => {
-                    if(element.userName === inputName.value) {
-                        button.disabled = true;
-                        verify = false;
-                        button.style.backgroundColor = "black";
-                        button.style.color = "#8e0eff";
-                        return;
-                    }
-                });
-
-                if(verify === true) {
-                    button.disabled = false;
-                    button.style.backgroundColor = "#8e0eff";
-                    button.style.color = "white";
-                }
-            };
-
-            verifyName();
-        } else {
-            button.disabled = true;
-            button.style.backgroundColor = "black";
-            button.style.color = "#8e0eff";
-        }
-    });
-
-    const button = form.appendChild(document.createElement("input"));
-    button.type = "submit";
-    button.value = "Salvar";
-    button.name = "submitName";
-    button.classList.add("buttonTryAgain");
-    button.addEventListener("click", () => {
-        button.disabled = true;
-        form.action = `/updateName/${localStorage.name}/${inputName.value}`;
-        localStorage.name = inputName.value;
-        button.style.backgroundColor = "black";
-        button.style.color = "#8e0eff";
-        form.submit();
-    });
+    createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "Mudar Nome", "newName", "dontStop");
 };
 
 const snakeColor = () => {
-    const arrayColors = [
-        "#8e0eff",
-        "red",
-        "#33ff00",
-        "white",
-        "blue",
-        "#ff00bb"
-    ];
-
-    let positionColor = localStorage.positionColor || 0;
-
     const menuItens = document.querySelector("#menuItens");
+
+    board.stop = true;
 
     menuItens.style.display = "none";
     document.querySelector("#menuHamburguerSpan").style.color = "black";
 
-    const menu = document.querySelector(".board").appendChild(document.createElement("div"));
-    menu.classList.add("menu");
-
-    const spanA = menu.appendChild(document.createElement("span"));
-    spanA.innerText = "X";
-    spanA.id = "spanA";
-    spanA.style.position = "absolute";
-    spanA.style.top = "15px";
-    spanA.style.right = "15px";
-    spanA.onclick = () => menu.remove();
-
-    menu.appendChild(document.createElement("span")).innerText = "Mudar Cor";
-
-    const divChoiceColor = menu.appendChild(document.createElement("div"));
-    divChoiceColor.classList.add("divChoiceColor");
-
-    const buttonLeftColor = divChoiceColor.appendChild(document.createElement("button"));
-    buttonLeftColor.innerText = "<-";
-    buttonLeftColor.classList.add("buttonChoiceColor");
-
-    const colorExample = divChoiceColor.appendChild(document.createElement("div"));
-    colorExample.classList.add("colorExample");
-    colorExample.style.backgroundColor = arrayColors[positionColor];
-
-    const buttonRightColor = divChoiceColor.appendChild(document.createElement("button"));
-    buttonRightColor.innerText = "->";
-    buttonRightColor.classList.add("buttonChoiceColor");
-
-    const buttonSave = menu.appendChild(document.createElement("button"));
-    buttonSave.innerText = "Salvar";
-    buttonSave.classList.add("buttonTryAgain");
-
-    buttonLeftColor.onclick = () => {
-        if(positionColor != 0){
-            positionColor--;
-        } else {
-            positionColor = arrayColors.length - 1;
-        }
-
-        colorExample.style.backgroundColor = arrayColors[positionColor];
-    };
-
-    buttonRightColor.onclick = () => {
-        if(positionColor != arrayColors.length - 1){
-            positionColor++;
-        } else {
-            positionColor = 0;
-        }
-
-        colorExample.style.backgroundColor = arrayColors[positionColor];
-    };
-
-
-    buttonSave.onclick = () => {
-        localStorage.positionColor = positionColor;
-        localStorage.snakeColor = arrayColors[positionColor];
-        document.documentElement.style.setProperty("--snakeColor", arrayColors[positionColor]);
-
-        menu.remove();
-    };
+    createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "Mudar Cor", "switchColor", "dontStop");
 };
 
 const createAccount = () => {
@@ -682,170 +713,29 @@ const createAccount = () => {
         return alert(`Este é o seu nome: ${localStorage.name}`);
     }
 
-    board.stop = true;
     const menuItens = document.querySelector("#menuItens");
+
+    board.stop = true;
 
     menuItens.style.display = "none";
     document.querySelector("#menuHamburguerSpan").style.color = "black";
 
-    const menu = document.querySelector(".board").appendChild(document.createElement("div"));
-    menu.classList.add("menu");
+    board.score = 1;
+    maxScore[positionBoard] = board.score;
+    localStorage.score = JSON.stringify(maxScore);
 
-    const a = menu.appendChild(document.createElement("a"));
-    a.id = "aMenu";
-    a.href = "/";
-    a.style.textDecoration = "none";
-    a.style.color ="#8e0eff";
-
-    const spanA = a.appendChild(document.createElement("span"));
-    spanA.innerText = "X";
-    spanA.id = "spanA";
-
-    menu.appendChild(document.createElement("span")).innerText = "Cadastrar User";
-
-    const form = menu.appendChild(document.createElement("form"));
-    form.method = "POST";
-    form.action = `/saveScore`;
-
-    const inputScore = form.appendChild(document.createElement("input"));
-    inputScore.name = "score";
-    inputScore.value = localStorage.score || 0;
-    inputScore.style.display = "none";
-
-    const inputName = form.appendChild(document.createElement("input"));
-    inputName.type = "text";
-    inputName.placeholder = "Digite o nome...";
-    inputName.name = "userName";
-    inputName.classList.add("inputName");
-    inputName.focus();
-
-    inputName.addEventListener("input", () => {
-        if(inputName.value.length >= 3 && inputName.value.length <= 10){
-            button.disabled = true;
-            button.style.backgroundColor = "black";
-            button.style.color = "#8e0eff";
-
-            const verifyName = async () => {
-                const reponse = await fetch(BASE_URL + "/getAllData");
-                const data = await reponse.json();
-                let verify = true;
-
-                data.listRanking.forEach(element => {
-                    if(element.userName === inputName.value) {
-                        button.disabled = true;
-                        verify = false;
-                        button.style.backgroundColor = "black";
-                        button.style.color = "#8e0eff";
-                        return;
-                    }
-                });
-
-                if(verify === true) {
-                    button.disabled = false;
-                    button.style.backgroundColor = "#8e0eff";
-                    button.style.color = "white";
-                }
-            };
-
-            verifyName();
-        } else {
-            button.disabled = true;
-            button.style.backgroundColor = "black";
-            button.style.color = "#8e0eff";
-        }
-    });
-
-    const button = form.appendChild(document.createElement("input"));
-    button.type = "submit";
-    button.value = "Salvar";
-    button.name = "submitRanking";
-    button.classList.add("buttonTryAgain");
-
-    button.addEventListener("click", () => {
-        button.disabled = true;
-        localStorage.name = inputName.value;
-        button.style.backgroundColor = "black";
-        button.style.color = "#8e0eff";
-        form.submit();
-    });
+    createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "Cadastrar User", "saveScore", "dontStop");
 };
 
 const getBoard = () => {
-    const arrayBoard = [
-        [6, 6, "Easy"],
-        [10, 10, "Normal"],
-        [15, 15, "Hard"]
-    ];
-
-    let positionBoard = localStorage.positionBoard || 1;
-
     const menuItens = document.querySelector("#menuItens");
+
+    board.stop = true;
 
     menuItens.style.display = "none";
     document.querySelector("#menuHamburguerSpan").style.color = "black";
 
-    const menu = document.querySelector(".board").appendChild(document.createElement("div"));
-    menu.classList.add("menu");
-
-    const spanA = menu.appendChild(document.createElement("span"));
-    spanA.innerText = "X";
-    spanA.id = "spanA";
-    spanA.style.position = "absolute";
-    spanA.style.top = "15px";
-    spanA.style.right = "15px";
-    spanA.onclick = () => menu.remove();
-
-    menu.appendChild(document.createElement("span")).innerText = "Mudar Tamanho";
-
-    const divChoiceBoard = menu.appendChild(document.createElement("div"));
-    divChoiceBoard.classList.add("divChoiceBoard");
-
-    const buttonLeftBoard = divChoiceBoard.appendChild(document.createElement("button"));
-    buttonLeftBoard.innerText = "<-";
-    buttonLeftBoard.classList.add("buttonChoiceBoard");
-
-    const boardHW = divChoiceBoard.appendChild(document.createElement("div"));
-    boardHW.classList.add("boardHW");
-    const spanBoard = boardHW.appendChild(document.createElement("span"));
-    spanBoard.innerText = arrayBoard[positionBoard][2];
-    spanBoard.id = "spanBoard";
-
-    const buttonRightBoard = divChoiceBoard.appendChild(document.createElement("button"));
-    buttonRightBoard.innerText = "->";
-    buttonRightBoard.classList.add("buttonChoiceBoard");
-
-    const buttonSave = menu.appendChild(document.createElement("button"));
-    buttonSave.innerText = "Salvar";
-    buttonSave.classList.add("buttonTryAgain");
-
-    buttonLeftBoard.onclick = () => {
-        if(positionBoard != 0){
-            positionBoard--;
-        } else {
-            positionBoard = arrayBoard.length - 1;
-        }
-
-        spanBoard.innerText = arrayBoard[positionBoard][2];
-    };
-
-    buttonRightBoard.onclick = () => {
-        if(positionBoard != arrayBoard.length - 1){
-            positionBoard++;
-        } else {
-            positionBoard = 0;
-        }
-
-        spanBoard.innerText = arrayBoard[positionBoard][2];
-    };
-
-
-    buttonSave.onclick = () => {
-        localStorage.positionBoard = positionBoard;
-        localStorage.boardHeight = arrayBoard[positionBoard][0];
-        localStorage.boardWidth = arrayBoard[positionBoard][1];
-
-        window.location.href = "/";
-    };
+    createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "Mudar Tamanho", "getBoard", "dontStop");
 };
 
 loadName();

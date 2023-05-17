@@ -2,9 +2,8 @@ const Ranking = require("../models/schema");
 
 const verifyName = async (req, res, next) => {
     const { userName } = req.body;
-    const newUserName = req.params.newUserName || userName;
 
-    const verify = await Ranking.findOne({ userName: newUserName });
+    const verify = await Ranking.findOne({ userName: userName });
 
     if(verify){
         return res.status(409).json({ message: "Nome já cadastrado." });

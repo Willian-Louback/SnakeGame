@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const BASE_URL = "https://snakegamewillianback.up.railway.app";
-    //const BASE_URL = "http://localhost:3100";
+    //const BASE_URL = "https://snakegamewillianback.up.railway.app";
+    const BASE_URL = "http://localhost:3100";
     const titleButton = document.querySelector(".titleButton");
     const changePosition = localStorage.changePosition || 1;
     localStorage.changeMode ? titleButton.innerHTML = `${localStorage.changeMode}<i class="bi bi-chevron-compact-down iconChoice" style="font-size: 17px;">` : titleButton.innerHTML = "Normal <i class=\"bi bi-chevron-compact-down iconChoice\" style=\"font-size: 17px;\">";
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const spanScore = rankingLi.appendChild(document.createElement("span"));
             spanScore.classList.add("infoRanking");
 
-            if(data.listRanking.length && data.listRanking[i] && data.listRanking[i].scores && data.listRanking[i].scores !== 0){
+            if(data.listRanking.length && data.listRanking[i] && data.listRanking[i].score && data.listRanking[i].score !== 0){
                 return { spanName, spanScore };
             }
         }
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 break;
             }
 
-            if(data.listRanking[i] && data.listRanking[i].scores && data.listRanking[i].scores !== 0){
+            if(data.listRanking[i] && data.listRanking[i].score && data.listRanking[i].score !== 0){
                 const { spanName, spanScore } = createLi(i);
 
                 i === 0 ? spanName.innerHTML = `<i class="bi bi-trophy first"></i> ${data.listRanking[i].userName}`
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         : (i === 2) ? spanName.innerHTML = `<i class="bi bi-trophy third"></i> ${data.listRanking[i].userName}`
                             : spanName.innerText = ` ${data.listRanking[i].userName}`;
 
-                spanScore.innerText = `Score: ${data.listRanking[i].scores}`;
+                spanScore.innerText = `Score: ${data.listRanking[i].score}`;
             }
         }
 

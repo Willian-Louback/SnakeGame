@@ -11,8 +11,8 @@ const renderRanking = (_req, res) => {
 const getData = async (req, res) => {
     try {
         const listRanking = await Ranking.find();
-        const users = listRanking.map(user => ({ userName: user.userName, scores: user.scores[req.params.position] }))
-            .sort((a, b) => b.scores - a.scores) // Se der positivo o "B" fica no topo, se for negativo o "A" fica no topo;
+        const users = listRanking.map(user => ({ userName: user.userName, score: user.scores[req.params.position] }))
+            .sort((a, b) => b.score - a.score) // Se der positivo o "B" fica no topo, se for negativo o "A" fica no topo;
             .slice(0, 10);
 
         return res.status(200).json({ listRanking: users });
@@ -43,7 +43,7 @@ const saveScore = async (req, res) => {
 
     try{
         const savedRanking = await Ranking.create(dataRanking);
-        return res.status(201).json({ message: "created", id: savedRanking._id });
+        return res.status(201).json({ message: "created", id: savedRanking._id, name: savedRanking.userName });
     } catch(error) {
         res.status(500).send({error: error.message});
     }
@@ -75,10 +75,10 @@ const updateScore = async (req, res) => {
 };
 
 const updateName = async (req, res) => {
-    const dataRanking = await Ranking.findOne({ userName: req.params.userName });
+    const { id, userName } = req.body;
     try {
-        await Ranking.updateOne({ _id: dataRanking._id }, { userName: req.params.newUserName });
-        return res.status(200).json({ message: "updated" });
+        await Ranking.updateOne({ _id: id }, { userName: userName });
+        return res.status(200).json({ message: "updated", name: userName });
     } catch(error) {
         res.status(500).send({error: error.message});
     }
