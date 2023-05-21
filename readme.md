@@ -1,6 +1,6 @@
 # Olá! Gostaria de apresentar o meu repositório do jogo da cobrinha, uma divertida implementação que foi desenvolvida separadamente em backend e frontend.
 
-No backend, utilizei JavaScript e Node.js para construir uma API eficiente. Através do framework Express, trabalhei com rotas que permitem o correto funcionamento do jogo. Optei por uma abordagem orientada a objetos para garantir um código mais organizado. Recentemente, fiz algumas alterações e agora estou utilizando o Docker para criar a imagem do projeto. Além disso, migrei o backend do jogo para a plataforma [Back4App](https://containers.back4app.com/).
+No backend, utilizei Node.js para construir uma API eficiente. Através do framework Express, trabalhei com rotas que permitem o correto funcionamento do jogo. Optei por uma abordagem orientada a objetos para garantir um código mais organizado. Recentemente, fiz algumas alterações e agora estou utilizando o Docker para criar a imagem do projeto. Além disso, migrei o backend do jogo para a plataforma [Back4App](https://containers.back4app.com/).
 
 Já o frontend foi desenvolvido utilizando JavaScript, HTML e CSS. Essas tecnologias foram combinadas para criar uma interface atraente e responsiva. O frontend do jogo foi hospedado no [Netlify](https://app.netlify.com/).
 
