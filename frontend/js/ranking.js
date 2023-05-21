@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const BASE_URL = "https://snakegamewillianback.up.railway.app";
+    const BASE_URL = "https://snakegameback-williandlouback.b4a.run/";
     //const BASE_URL = "http://localhost:3100";
     const titleButton = document.querySelector(".titleButton");
     const changePosition = localStorage.changePosition || 1;

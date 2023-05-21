@@ -4,7 +4,7 @@ let attemps = 0;
 let maxScore = localStorage.score ? JSON.parse(localStorage.score) : [0, 0, 0];
 let boardMode = localStorage.boardMode || "Normal";
 let positionBoard = localStorage.positionBoard || 1;
-const BASE_URL = "https://snakegamewillianback.up.railway.app";
+const BASE_URL = "https://snakegameback-williandlouback.b4a.run/";
 //const BASE_URL = "http://localhost:3100";
 
 class Board {
