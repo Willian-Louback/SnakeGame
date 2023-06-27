@@ -13,7 +13,7 @@ class Board {
         this.column = column;
         this.line = line;
         this.snakeManipulator = new Snake();
-        this.aiMode = true;
+        this.aiMode = false;
         this.ai = null;
     }
 
@@ -26,7 +26,7 @@ class Board {
     setIntervalID = null;
     food = [null, null];
     keySwitch = "ArrowLeft";
-    moveSpeed = 10;
+    moveSpeed = 220;
     stop = false;
     score = 0;
 
@@ -150,7 +150,9 @@ class Board {
     }
 
     generateFood(){
-        clearInterval(this.setIntervalID);
+        if(this.aiMode){
+            clearInterval(this.setIntervalID);
+        }
 
         this.food[0] = Math.floor(Math.random() * board.line);
         this.food[1] = Math.floor(Math.random() * board.column);
