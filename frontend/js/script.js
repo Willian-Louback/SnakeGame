@@ -12,7 +12,7 @@ class Board {
         this.column = column;
         this.line = line;
         this.snakeManipulator = new Snake();
-        this.aiMode = false;
+        this.aiMode = true;
         this.ai = null;
     }
 
@@ -23,10 +23,9 @@ class Board {
     ];
 
     setIntervalID = null;
-    setIntervalAi = null;
     food = [null, null];
     keySwitch = "ArrowLeft";
-    moveSpeed = 220;
+    moveSpeed = 120;
     stop = false;
     score = 0;
 
@@ -71,6 +70,10 @@ class Board {
     }
 
     move(){
+        if(this.aiMode){
+            this.ai.calculateMove(this.food[1], this.food[0]);
+        }
+
         switch (this.keySwitch){
         case "ArrowRight":
             this.snake.push(new Snake(this.snake[this.snake.length - 1].column + 1, this.snake[this.snake.length - 1].line));
@@ -115,8 +118,6 @@ class Board {
             }
         } else if(square.classList.contains("body")){
             if(this.aiMode === true) {
-                this.stop = true;
-                clearInterval(this.setIntervalAi);
                 clearInterval(this.setIntervalID);
                 alert("Inteligência artificial perdeu :(");
                 console.log(square);
@@ -135,7 +136,7 @@ class Board {
     }
 
     generateFood(){
-        clearInterval(this.setIntervalAi);
+        clearInterval(this.setIntervalID);
 
         this.food[0] = Math.floor(Math.random() * board.line);
         this.food[1] = Math.floor(Math.random() * board.column);
@@ -149,8 +150,9 @@ class Board {
         const cell = new Cell(this.food[1], this.food[0], "food");
 
         cell.draw();
+
         if(this.aiMode){
-            this.setIntervalAi = setInterval(() => this.ai.calculateMove(this.food[1], this.food[0]), board.moveSpeed);
+            this.setIntervalID = setInterval(() => this.move(), this.moveSpeed);
         }
     }
 
@@ -349,10 +351,11 @@ class Ai {
     }
 
     calculateMove(fruitX, fruitY) {
+        let verify = true; // Usado para verificar se a ação escolhida é possível, melhorar isso depois
+
         const headX = board.snake[board.snake.length - 1].column;
         const headY = board.snake[board.snake.length - 1].line;
         console.log("aqui",headX, headY);
-        //const choiceRandom = Math.floor(Math.random() * 4);
 
         // <<< Não está random aqui
         let choiceRandom = null;
@@ -393,112 +396,158 @@ class Ai {
         // >>> Tratando melhor movimento em relação a fruta
 
         // <<< Verificando se IA escolheu um movimento válido
-        switch(choiceRandom){
-        case 0:
-            this.targetVerify = "ArrowRight";
-            break;
-        case 1:
-            this.targetVerify = "ArrowUp";
-            break;
-        case 2:
-            this.targetVerify = "ArrowLeft";
-            break;
-        case 3:
-            this.targetVerify = "ArrowDown";
-            break;
-        }
+        const verifyMove = () => {
+            switch(choiceRandom){
+            case 0:
+                this.targetVerify = "ArrowRight";
+                break;
+            case 1:
+                this.targetVerify = "ArrowUp";
+                break;
+            case 2:
+                this.targetVerify = "ArrowLeft";
+                break;
+            case 3:
+                this.targetVerify = "ArrowDown";
+                break;
+            }
 
-        if(!this.firstTime){
-            if(
-                (this.targetVerify === "ArrowRight" && board.keySwitch === "ArrowLeft") ||
-                (this.targetVerify === "ArrowUp" && board.keySwitch === "ArrowDown") ||
-                (this.targetVerify === "ArrowDown" && board.keySwitch === "ArrowUp") ||
-                (this.targetVerify === "ArrowLeft" && board.keySwitch === "ArrowRight")
-            ){
-                return;
-            }
-        } else {
-            if(
-                (this.targetVerify === "ArrowUp" && board.keySwitch === "ArrowDown") ||
-                (this.targetVerify === "ArrowDown" && board.keySwitch === "ArrowUp") ||
-                (this.targetVerify === "ArrowLeft" && board.keySwitch === "ArrowRight")
-            ){
-                return;
+            if(!this.firstTime){
+                if(
+                    (this.targetVerify === "ArrowRight" && board.keySwitch === "ArrowLeft") ||
+                    (this.targetVerify === "ArrowUp" && board.keySwitch === "ArrowDown") ||
+                    (this.targetVerify === "ArrowDown" && board.keySwitch === "ArrowUp") ||
+                    (this.targetVerify === "ArrowLeft" && board.keySwitch === "ArrowRight")
+                ){
+                    return false;
+                }
             } else {
-                this.firstTime = false;
+                if(
+                    (this.targetVerify === "ArrowUp" && board.keySwitch === "ArrowDown") ||
+                    (this.targetVerify === "ArrowDown" && board.keySwitch === "ArrowUp") ||
+                    (this.targetVerify === "ArrowLeft" && board.keySwitch === "ArrowRight")
+                ){
+                    return false;
+                } else {
+                    this.firstTime = false;
+                    return true;
+                }
             }
-        }
+        };
+
+        verify = verifyMove();
+
+        /*if(verify === false) {
+            return;
+        }*/
         // >>> Verificando se IA escolheu um movimento válido
 
         // <<< Fazendo IA desviar do próprio corpo sempre que possível
         const checkPosition = (sense, sign) => {
+            teste++;
             let bodySnake = null;
+
             if(sense === "horizontal") {
                 if(sign === "positive"){
-                    bodySnake = document.querySelector(`#c${headX + 1}l${headY}`);
+                    if(headX !== (board.column - 1)) {
+                        bodySnake = document.querySelector(`#c${headX + 1}l${headY}`);
+                    } else {
+                        bodySnake = document.querySelector(`#c0l${headY}`);
+                    }
                 } else {
-                    bodySnake = document.querySelector(`#c${headX - 1}l${headY}`);
+                    if(headX !== 0) {
+                        bodySnake = document.querySelector(`#c${headX - 1}l${headY}`);
+                    } else {
+                        bodySnake = document.querySelector(`#c${board.column - 1}l${headY}`);
+                    }
                 }
             } else {
                 if(sign === "positive"){
-                    bodySnake = document.querySelector(`#c${headX}l${headY + 1}`);
+                    if(headY !== (board.line - 1)) {
+                        bodySnake = document.querySelector(`#c${headX}l${headY + 1}`);
+                    } else {
+                        bodySnake = document.querySelector(`#c${headX}l0`);
+                    }
                 } else {
-                    bodySnake = document.querySelector(`#c${headX}l${headY - 1}`);
+                    if(headY !== 0) {
+                        bodySnake = document.querySelector(`#c${headX}l${headY - 1}`);
+                    } else {
+                        bodySnake = document.querySelector(`#c${headX}l${board.line - 1}`);
+                    }
                 }
+            }
+
+            if(teste === 20){
+                console.log("F");
+                return false;
             }
 
             if(bodySnake.classList.contains("body")) {
                 console.log("vai dar merda", console.log(document.querySelector(`#c${headX}l${headY}`), bodySnake, sense, sign));
-                board.stop = true;
-                clearInterval(board.setIntervalAi);
-                clearInterval(board.setIntervalID);
-                alert("Inteligência artificial teste :)");
+                //alert("Inteligência artificial teste :)");
+                choiceRandom = Math.floor(Math.random() * 4);
+                verify = verifyMove();
+
                 return true;
             }
-            console.log("teste", console.log("sem var:",document.querySelector(`#c${board.snake[board.snake.length - 1].column}l${board.snake[board.snake.length - 1].line}`), bodySnake, sense, sign));
+            //console.log("teste", console.log("sem var:",document.querySelector(`#c${board.snake[board.snake.length - 1].column}l${board.snake[board.snake.length - 1].line}`), bodySnake, sense, sign));
 
             return false;
 
         };
 
-        switch(choiceRandom){
-        case 0: {
-            const bodySnake = checkPosition("horizontal", "positive");
-            if(bodySnake === false) {
+        //Apenas para teste
+        let teste = 0;
+        //Apenas para teste
+
+        const checkDeath = () => {
+            console.log(teste);
+
+            switch(choiceRandom){
+            case 0: {
+                const bodySnake = checkPosition("horizontal", "positive");
+                if(bodySnake === false) {
+                    break;
+                } else {
+                    checkDeath();
+                    console.log("vai de F");
+                }
                 break;
-            } else {
-                console.log("vai de F");
             }
-            break;
-        }
-        case 1: {
-            const bodySnake = checkPosition("vertical", "negative");
-            if(bodySnake === false) {
+            case 1: {
+                const bodySnake = checkPosition("vertical", "negative");
+                if(bodySnake === false) {
+                    break;
+                } else {
+                    checkDeath();
+                    console.log("vai de F");
+                }
                 break;
-            } else {
-                console.log("vai de F");
             }
-            break;
-        }
-        case 2: {
-            const bodySnake = checkPosition("horizontal", "negative");
-            if(bodySnake === false) {
+            case 2: {
+                const bodySnake = checkPosition("horizontal", "negative");
+                if(bodySnake === false) {
+                    break;
+                } else {
+                    checkDeath();
+                    console.log("vai de F");
+                }
                 break;
-            } else {
-                console.log("vai de F");
             }
-            break;
-        }
-        case 3: {
-            const bodySnake = checkPosition("vertical", "positive");
-            if(bodySnake === false) {
+            case 3: {
+                const bodySnake = checkPosition("vertical", "positive");
+                if(bodySnake === false) {
+                    break;
+                } else {
+                    checkDeath();
+                    console.log("vai de F");
+                }
                 break;
-            } else {
-                console.log("vai de F");
             }
-            break;
-        }
-        }
+            }
+        };
+
+        checkDeath();
         // >>> Fazendo IA desviar do próprio corpo sempre que possível
 
         // >>> Não está random aqui
@@ -508,18 +557,12 @@ class Ai {
             return;
         }
 
-        board.keySwitch = this.targetVerify;
-        /*VERIFICAR*/
-
-        clearInterval(board.setIntervalID);
-        console.log(fruitX, fruitY);
-
-        board.move();
-        board.setIntervalID = setInterval(() => board.move(), board.moveSpeed);
-        if(board.stop){
-            clearInterval(board.setIntervalID);
+        if(verify === false) {
             return;
         }
+
+        board.keySwitch = this.targetVerify;
+        /*VERIFICAR*/
     }
 }
 
