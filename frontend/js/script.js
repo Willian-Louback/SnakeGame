@@ -5,6 +5,7 @@ let maxScore = localStorage.score ? JSON.parse(localStorage.score) : [0, 0, 0];
 let boardMode = localStorage.boardMode || "Normal";
 let positionBoard = localStorage.positionBoard || 1;
 const BASE_URL = "https://snakegameback-williandlouback.b4a.run/";
+let maxScoreAi = 0;
 //const BASE_URL = "http://localhost:3100";
 
 class Board {
@@ -25,7 +26,7 @@ class Board {
     setIntervalID = null;
     food = [null, null];
     keySwitch = "ArrowLeft";
-    moveSpeed = 120;
+    moveSpeed = 10;
     stop = false;
     score = 0;
 
@@ -119,8 +120,21 @@ class Board {
         } else if(square.classList.contains("body")){
             if(this.aiMode === true) {
                 clearInterval(this.setIntervalID);
-                alert("Inteligência artificial perdeu :(");
-                console.log(square);
+                //console.log(square);
+
+                if(this.score > maxScoreAi) {
+                    maxScoreAi = this.score;
+                }
+
+                setTimeout(() => {
+                    console.log(maxScoreAi);
+                    document.querySelectorAll(".square").forEach(value => {
+                        value.remove();
+                    });
+
+                    board = new Board(columnBoard, lineBoard);
+                    board.build();
+                }, 100);
                 return;
             }
             this.gameOver();
@@ -355,7 +369,7 @@ class Ai {
 
         const headX = board.snake[board.snake.length - 1].column;
         const headY = board.snake[board.snake.length - 1].line;
-        console.log("aqui",headX, headY);
+        //console.log("aqui",headX, headY);
 
         // <<< Não está random aqui
         let choiceRandom = null;
@@ -478,12 +492,12 @@ class Ai {
             }
 
             if(teste === 20){
-                console.log("F");
+                //console.log("F");
                 return false;
             }
 
             if(bodySnake.classList.contains("body")) {
-                console.log("vai dar merda", console.log(document.querySelector(`#c${headX}l${headY}`), bodySnake, sense, sign));
+                //console.log("vai dar merda", console.log(document.querySelector(`#c${headX}l${headY}`), bodySnake, sense, sign));
                 //alert("Inteligência artificial teste :)");
                 choiceRandom = Math.floor(Math.random() * 4);
                 verify = verifyMove();
@@ -501,7 +515,7 @@ class Ai {
         //Apenas para teste
 
         const checkDeath = () => {
-            console.log(teste);
+            //console.log(teste);
 
             switch(choiceRandom){
             case 0: {
@@ -510,7 +524,7 @@ class Ai {
                     break;
                 } else {
                     checkDeath();
-                    console.log("vai de F");
+                    //console.log("vai de F");
                 }
                 break;
             }
@@ -520,7 +534,7 @@ class Ai {
                     break;
                 } else {
                     checkDeath();
-                    console.log("vai de F");
+                    //console.log("vai de F");
                 }
                 break;
             }
@@ -530,7 +544,7 @@ class Ai {
                     break;
                 } else {
                     checkDeath();
-                    console.log("vai de F");
+                    //console.log("vai de F");
                 }
                 break;
             }
@@ -540,7 +554,7 @@ class Ai {
                     break;
                 } else {
                     checkDeath();
-                    console.log("vai de F");
+                    //console.log("vai de F");
                 }
                 break;
             }
