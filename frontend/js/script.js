@@ -12,7 +12,7 @@ class Board {
         this.column = column;
         this.line = line;
         this.snakeManipulator = new Snake();
-        this.aiMode = true;
+        this.aiMode = false;
         this.ai = null;
     }
 
