@@ -12,6 +12,8 @@ class Board {
         this.column = column;
         this.line = line;
         this.snakeManipulator = new Snake();
+        this.aiMode = true;
+        this.ai = null;
     }
 
     snake = [
@@ -21,6 +23,7 @@ class Board {
     ];
 
     setIntervalID = null;
+    setIntervalAi = null;
     food = [null, null];
     keySwitch = "ArrowLeft";
     moveSpeed = 220;
@@ -29,6 +32,11 @@ class Board {
 
 
     build(){
+        if(this.aiMode){
+            this.ai = new Ai();
+            this.ai.run();
+        }
+
         document.querySelector("#maxScore").innerText = `Melhor Score: ${maxScore[positionBoard]}`;
         const boardMain = document.querySelector(".board");
         boardMain.style.gridTemplateColumns = `repeat(${this.column}, 1fr)`;
@@ -46,8 +54,11 @@ class Board {
         }
 
         this.generateFood();
-        this.snakeManipulator.moveButton(null);
-        this.snakeManipulator.moveKeydown();
+
+        if(this.aiMode === false){
+            //this.snakeManipulator.moveButton(null); Verificar se isso vai afetar algo
+            this.snakeManipulator.moveKeydown();
+        }
     }
 
     definingMove(){
@@ -103,6 +114,14 @@ class Board {
                 this.generateFood();
             }
         } else if(square.classList.contains("body")){
+            if(this.aiMode === true) {
+                this.stop = true;
+                clearInterval(this.setIntervalAi);
+                clearInterval(this.setIntervalID);
+                alert("Inteligência artificial perdeu :(");
+                console.log(square);
+                return;
+            }
             this.gameOver();
             return;
         } else {
@@ -116,6 +135,8 @@ class Board {
     }
 
     generateFood(){
+        clearInterval(this.setIntervalAi);
+
         this.food[0] = Math.floor(Math.random() * board.line);
         this.food[1] = Math.floor(Math.random() * board.column);
         const foodPosition = document.querySelector(`#c${this.food[1]}l${this.food[0]}`);
@@ -126,7 +147,11 @@ class Board {
         }
 
         const cell = new Cell(this.food[1], this.food[0], "food");
+
         cell.draw();
+        if(this.aiMode){
+            this.setIntervalAi = setInterval(() => this.ai.calculateMove(this.food[1], this.food[0]), board.moveSpeed);
+        }
     }
 
     gameOver(){
@@ -309,6 +334,191 @@ class Cell {
         } else {
             document.querySelector(`#c${board.snake[0].column}l${board.snake[0].line}`).classList.remove("snake", "body");
             board.snake.shift();
+        }
+    }
+}
+
+class Ai {
+    constructor() {
+        this.targetVerify = "ArrowLeft";
+        this.firstTime = true;
+    }
+
+    run(){
+        console.log("Inteligência Artificial iniciando...");
+    }
+
+    calculateMove(fruitX, fruitY) {
+        const headX = board.snake[board.snake.length - 1].column;
+        const headY = board.snake[board.snake.length - 1].line;
+        console.log("aqui",headX, headY);
+        //const choiceRandom = Math.floor(Math.random() * 4);
+
+        // <<< Não está random aqui
+        let choiceRandom = null;
+
+        // <<< Tratando melhor movimento em relação a fruta
+        let x = fruitX - headX;
+        let y = fruitY - headY;
+        let z = Math.abs(x) - Math.abs(y);
+
+        if(z === 0){
+            z = Math.floor(Math.random() * 2);
+            z === 0 ? z = -1 : null;
+        }
+
+        if(z > 0){
+            if(x === 0){
+                x = Math.floor(Math.random() * 2);
+                x === 0 ? x = -1 : null;
+            }
+
+            if(x > 0){
+                choiceRandom = 0;
+            } else {
+                choiceRandom = 2;
+            }
+        } else {
+            if(y === 0){
+                y = Math.floor(Math.random() * 2);
+                y === 0 ? y = -1 : null;
+            }
+
+            if(y > 0){
+                choiceRandom = 3;
+            } else {
+                choiceRandom = 1;
+            }
+        }
+        // >>> Tratando melhor movimento em relação a fruta
+
+        // <<< Verificando se IA escolheu um movimento válido
+        switch(choiceRandom){
+        case 0:
+            this.targetVerify = "ArrowRight";
+            break;
+        case 1:
+            this.targetVerify = "ArrowUp";
+            break;
+        case 2:
+            this.targetVerify = "ArrowLeft";
+            break;
+        case 3:
+            this.targetVerify = "ArrowDown";
+            break;
+        }
+
+        if(!this.firstTime){
+            if(
+                (this.targetVerify === "ArrowRight" && board.keySwitch === "ArrowLeft") ||
+                (this.targetVerify === "ArrowUp" && board.keySwitch === "ArrowDown") ||
+                (this.targetVerify === "ArrowDown" && board.keySwitch === "ArrowUp") ||
+                (this.targetVerify === "ArrowLeft" && board.keySwitch === "ArrowRight")
+            ){
+                return;
+            }
+        } else {
+            if(
+                (this.targetVerify === "ArrowUp" && board.keySwitch === "ArrowDown") ||
+                (this.targetVerify === "ArrowDown" && board.keySwitch === "ArrowUp") ||
+                (this.targetVerify === "ArrowLeft" && board.keySwitch === "ArrowRight")
+            ){
+                return;
+            } else {
+                this.firstTime = false;
+            }
+        }
+        // >>> Verificando se IA escolheu um movimento válido
+
+        // <<< Fazendo IA desviar do próprio corpo sempre que possível
+        const checkPosition = (sense, sign) => {
+            let bodySnake = null;
+            if(sense === "horizontal") {
+                if(sign === "positive"){
+                    bodySnake = document.querySelector(`#c${headX + 1}l${headY}`);
+                } else {
+                    bodySnake = document.querySelector(`#c${headX - 1}l${headY}`);
+                }
+            } else {
+                if(sign === "positive"){
+                    bodySnake = document.querySelector(`#c${headX}l${headY + 1}`);
+                } else {
+                    bodySnake = document.querySelector(`#c${headX}l${headY - 1}`);
+                }
+            }
+
+            if(bodySnake.classList.contains("body")) {
+                console.log("vai dar merda", console.log(document.querySelector(`#c${headX}l${headY}`), bodySnake, sense, sign));
+                board.stop = true;
+                clearInterval(board.setIntervalAi);
+                clearInterval(board.setIntervalID);
+                alert("Inteligência artificial teste :)");
+                return true;
+            }
+            console.log("teste", console.log("sem var:",document.querySelector(`#c${board.snake[board.snake.length - 1].column}l${board.snake[board.snake.length - 1].line}`), bodySnake, sense, sign));
+
+            return false;
+
+        };
+
+        switch(choiceRandom){
+        case 0: {
+            const bodySnake = checkPosition("horizontal", "positive");
+            if(bodySnake === false) {
+                break;
+            } else {
+                console.log("vai de F");
+            }
+            break;
+        }
+        case 1: {
+            const bodySnake = checkPosition("vertical", "negative");
+            if(bodySnake === false) {
+                break;
+            } else {
+                console.log("vai de F");
+            }
+            break;
+        }
+        case 2: {
+            const bodySnake = checkPosition("horizontal", "negative");
+            if(bodySnake === false) {
+                break;
+            } else {
+                console.log("vai de F");
+            }
+            break;
+        }
+        case 3: {
+            const bodySnake = checkPosition("vertical", "positive");
+            if(bodySnake === false) {
+                break;
+            } else {
+                console.log("vai de F");
+            }
+            break;
+        }
+        }
+        // >>> Fazendo IA desviar do próprio corpo sempre que possível
+
+        // >>> Não está random aqui
+
+        /*VERIFICAR*/
+        if(this.targetVerify === board.keySwitch){
+            return;
+        }
+
+        board.keySwitch = this.targetVerify;
+        /*VERIFICAR*/
+
+        clearInterval(board.setIntervalID);
+        console.log(fruitX, fruitY);
+
+        board.move();
+        board.setIntervalID = setInterval(() => board.move(), board.moveSpeed);
+        if(board.stop){
+            clearInterval(board.setIntervalID);
+            return;
         }
     }
 }
