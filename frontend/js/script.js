@@ -1,5 +1,7 @@
 const columnBoard = parseInt(localStorage.boardHeight) || 10;
 const lineBoard = parseInt(localStorage.boardWidth) || 10;
+const quantidadeTeste = 0;
+let generation = 1;
 let attemps = 0;
 let maxScore = localStorage.score ? JSON.parse(localStorage.score) : [0, 0, 0];
 let boardMode = localStorage.boardMode || "Normal";
@@ -9,12 +11,14 @@ let maxScoreAi = 0;
 //const BASE_URL = "http://localhost:3100";
 
 class Board {
-    constructor(column, line){
+    constructor(column, line, numberBoard){
         this.column = column;
         this.line = line;
         this.snakeManipulator = new Snake();
         this.aiMode = false;
         this.ai = null;
+        this.contador = 0;
+        this.numberBoard = numberBoard;
     }
 
     snake = [
@@ -33,24 +37,31 @@ class Board {
 
     build(){
         if(this.aiMode){
-            this.ai = new Ai();
+            this.ai = new Ai(this.numberBoard, this);
             this.ai.run();
         }
 
         document.querySelector("#maxScore").innerText = `Melhor Score: ${maxScore[positionBoard]}`;
-        const boardMain = document.querySelector(".board");
+        const boardArea = document.querySelector(".boardArea");
+        boardArea.style.gridTemplateRows = `repeat(${Math.sqrt(quantidadeTeste)}, 1fr)`;
+        boardArea.style.gridTemplateColumns = `repeat(${Math.sqrt(quantidadeTeste)}, 1fr)`;
+
+        const boardMain = boardArea.appendChild(document.createElement("div"));
+        boardMain.classList.add("board");
+        boardMain.id = `b${this.numberBoard}`;
+
         boardMain.style.gridTemplateColumns = `repeat(${this.column}, 1fr)`;
         boardMain.style.gridTemplateRows = `repeat(${this.line}, 1fr)`;
         for(let i = 0; i < this.column; i++){
             for(let j = 0; j < this.line; j++){
-                boardMain.appendChild(document.createElement("div")).classList.add("square");
-                boardMain.lastChild.id = `c${j}l${i}`;
+                boardMain.appendChild(document.createElement("div")).classList.add(`squareB${this.numberBoard}`);
+                boardMain.lastChild.id = `c${j}l${i}b${this.numberBoard}`;
             }
         }
 
         for(let i = 0; i < this.snake.length; i++){
-            document.querySelector(`#c${this.snake[i].column}l${this.snake[i].line}`).classList.add("snake");
-            i < (this.snake.length - 1) ? document.querySelector(`#c${this.snake[i].column}l${this.snake[i].line}`).classList.add("body") : null;
+            document.querySelector(`#c${this.snake[i].column}l${this.snake[i].line}b${this.numberBoard}`).classList.add("snake");
+            i < (this.snake.length - 1) ? document.querySelector(`#c${this.snake[i].column}l${this.snake[i].line}b${this.numberBoard}`).classList.add("body") : null;
         }
 
         this.generateFood();
@@ -72,69 +83,94 @@ class Board {
 
     move(){
         if(this.aiMode){
-            this.ai.calculateMove(this.food[1], this.food[0]);
+            this.ai.algoritmoGenetico(this.food[1], this.food[0]);
         }
 
         switch (this.keySwitch){
         case "ArrowRight":
             this.snake.push(new Snake(this.snake[this.snake.length - 1].column + 1, this.snake[this.snake.length - 1].line));
-            if(this.snake[this.snake.length - 1].column === board.column){
+            if(this.snake[this.snake.length - 1].column === this.column){
                 this.snake[this.snake.length - 1].column = 0;
             }
             break;
         case "ArrowUp":
             this.snake.push(new Snake(this.snake[this.snake.length - 1].column, this.snake[this.snake.length - 1].line - 1));
             if(this.snake[this.snake.length - 1].line === -1){
-                this.snake[this.snake.length - 1].line = board.line - 1;
+                this.snake[this.snake.length - 1].line = this.line - 1;
             }
             break;
         case "ArrowLeft":
             this.snake.push(new Snake(this.snake[this.snake.length - 1].column - 1, this.snake[this.snake.length - 1].line));
             if(this.snake[this.snake.length - 1].column === -1){
-                this.snake[this.snake.length - 1].column = board.column - 1;
+                this.snake[this.snake.length - 1].column = this.column - 1;
             }
             break;
         case "ArrowDown":
             this.snake.push(new Snake(this.snake[this.snake.length - 1].column, this.snake[this.snake.length - 1].line + 1));
-            if(this.snake[this.snake.length - 1].line === board.line){
+            if(this.snake[this.snake.length - 1].line === this.line){
                 this.snake[this.snake.length - 1].line = 0;
             }
             break;
         }
 
-        const cell = new Cell(this.snake[this.snake.length - 1].column, this.snake[this.snake.length - 1].line, "snake");
+        const cell = new Cell(this.snake[this.snake.length - 1].column, this.snake[this.snake.length - 1].line, "snake", this.numberBoard, this);
         cell.draw();
     }
 
     verifyMove(square){
-        const cell = new Cell();
-        if((this.snake.length - 1) === (board.column * board.line)) {
-            board.win();
+        const cell = new Cell(this.snake[this.snake.length - 1].column, this.snake[this.snake.length - 1].line, "snake", this.numberBoard, this);
+
+        if((this.snake.length - 1) === (this.column * this.line)) {
+            this.win();
             return;
         } else if(square.classList.contains("food")){
             cell.erase(square, true);
             this.calculateScore();
-            if((this.snake.length) < (board.column * board.line)){
+            if((this.snake.length) < (this.column * this.line)){
                 this.generateFood();
             }
         } else if(square.classList.contains("body")){
             if(this.aiMode === true) {
                 clearInterval(this.setIntervalID);
-                //console.log(square);
+                board.contador++;
 
-                if(this.score > maxScoreAi) {
-                    maxScoreAi = this.score;
+                if(board.contador === quantidadeTeste){
+                    if(this.score > maxScoreAi) {
+                        maxScoreAi = this.score;
+                    }
+
+                    console.log(this.numberBoard);
+
+                    setTimeout(() => {
+                        generation++;
+                        document.querySelector("#score").innerText = `Best score: ${maxScoreAi}`;
+                        document.querySelector("#attemps").innerText = `Geração: ${generation}`;
+                        console.log(maxScoreAi);
+                        document.querySelectorAll(`.board`).forEach(value => {
+                            value.remove();
+                        });
+
+                        board = new Board(columnBoard, lineBoard, 1);
+                        board.build();
+
+                        boards = [];
+
+                        for (let i = 2; i <= quantidadeTeste; i++) {
+                            const newboards = new Board(columnBoard, lineBoard, i);
+                            boards.push(newboards);
+                            boards[boards.length - 1].build();
+                        }
+
+                        /*board2 = new Board(columnBoard, lineBoard, 2);
+                        board2.build();
+
+                        board3 = new Board(columnBoard, lineBoard, 3);
+                        board3.build();
+
+                        board4 = new Board(columnBoard, lineBoard, 4);
+                        board4.build();*/
+                    }, 1000);
                 }
-
-                setTimeout(() => {
-                    console.log(maxScoreAi);
-                    document.querySelectorAll(".square").forEach(value => {
-                        value.remove();
-                    });
-
-                    board = new Board(columnBoard, lineBoard);
-                    board.build();
-                }, 100);
                 return;
             }
             this.gameOver();
@@ -146,7 +182,9 @@ class Board {
 
     calculateScore(){
         this.score += 10;
-        document.querySelector("#score").innerText = `Score: ${this.score}`;
+        if(this.aiMode === false){
+            document.querySelector("#score").innerText = `Score: ${this.score}`;
+        }
     }
 
     generateFood(){
@@ -154,16 +192,16 @@ class Board {
             clearInterval(this.setIntervalID);
         }
 
-        this.food[0] = Math.floor(Math.random() * board.line);
-        this.food[1] = Math.floor(Math.random() * board.column);
-        const foodPosition = document.querySelector(`#c${this.food[1]}l${this.food[0]}`);
+        this.food[0] = Math.floor(Math.random() * this.line);
+        this.food[1] = Math.floor(Math.random() * this.column);
+        const foodPosition = document.querySelector(`#c${this.food[1]}l${this.food[0]}b${this.numberBoard}`);
 
         if(foodPosition.classList.contains("snake")){
             this.generateFood();
             return;
         }
 
-        const cell = new Cell(this.food[1], this.food[0], "food");
+        const cell = new Cell(this.food[1], this.food[0], "food", this.numberBoard, this);
 
         cell.draw();
 
@@ -192,7 +230,7 @@ class Board {
                 localStorage.score = JSON.stringify(maxScore);
                 document.querySelector("#maxScore").innerText = `Melhor Score: ${maxScore[positionBoard]}`;
 
-                createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "Você perdeu!", "saveScore");
+                createMenu(document.querySelector(".boardArea").appendChild(document.createElement("div")), "Você perdeu!", "saveScore");
             } else if(
                 (maxScore[positionBoard] < this.score) &&
                 (result === false)
@@ -201,9 +239,9 @@ class Board {
                 localStorage.score = JSON.stringify(maxScore);
                 document.querySelector("#maxScore").innerText = `Melhor Score: ${maxScore[positionBoard]}`;
 
-                createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "New Record!", "updateScore");
+                createMenu(document.querySelector(".boardArea").appendChild(document.createElement("div")), "New Record!", "updateScore");
             } else {
-                createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "Você perdeu!", "lost");
+                createMenu(document.querySelector(".boardArea").appendChild(document.createElement("div")), "Você perdeu!", "lost");
             }
         };
 
@@ -230,13 +268,13 @@ class Board {
                 localStorage.score = JSON.stringify(maxScore);
                 document.querySelector("#maxScore").innerText = `Melhor Score: ${maxScore[positionBoard]}`;
 
-                createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "Você Venceu!", "saveScore");
+                createMenu(document.querySelector(".boardArea").appendChild(document.createElement("div")), "Você Venceu!", "saveScore");
             } else {
                 maxScore[positionBoard] = this.score;
                 localStorage.score = JSON.stringify(maxScore);
                 document.querySelector("#maxScore").innerText = `Melhor Score: ${maxScore[positionBoard]}`;
 
-                createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "Você venceu!", "updateScore");
+                createMenu(document.querySelector(".boardArea").appendChild(document.createElement("div")), "Você venceu!", "updateScore");
             }
         };
 
@@ -329,20 +367,22 @@ class Snake {
 }
 
 class Cell {
-    constructor(column, line, type){
+    constructor(column, line, type, numberBoard, boardThis){
         this.column = column;
         this.line = line;
+        this.numberBoard = numberBoard;
         this.type = type;
+        this.boardThis = boardThis;
     }
 
     draw(){
-        const square = document.querySelector(`#c${this.column}l${this.line}`);
+        const square = document.querySelector(`#c${this.column}l${this.line}b${this.numberBoard}`);
         if(this.type === "food"){
             square.classList.add("food");
         } else {
-            document.querySelector(`#c${board.snake[board.snake.length - 2].column}l${board.snake[board.snake.length - 2].line}`).classList.add("body");
+            document.querySelector(`#c${this.boardThis.snake[this.boardThis.snake.length - 2].column}l${this.boardThis.snake[this.boardThis.snake.length - 2].line}b${this.numberBoard}`).classList.add("body");
             square.classList.add("snake");
-            board.verifyMove(square);
+            this.boardThis.verifyMove(square);
         }
     }
 
@@ -350,28 +390,30 @@ class Cell {
         if(removeFood){
             square.classList.remove("food");
         } else {
-            document.querySelector(`#c${board.snake[0].column}l${board.snake[0].line}`).classList.remove("snake", "body");
-            board.snake.shift();
+            document.querySelector(`#c${this.boardThis.snake[0].column}l${this.boardThis.snake[0].line}b${this.numberBoard}`).classList.remove("snake", "body");
+            this.boardThis.snake.shift();
         }
     }
 }
 
 class Ai {
-    constructor() {
+    constructor(numberBoard, board) {
         this.targetVerify = "ArrowLeft";
         this.firstTime = true;
+        this.numberBoard = numberBoard;
+        this.board = board;
     }
 
     run(){
         console.log("Inteligência Artificial iniciando...");
     }
 
-    calculateMove(fruitX, fruitY) {
+    algoritmoGenetico(fruitX, fruitY) {
         let verify = true; // Usado para verificar se a ação escolhida é possível, melhorar isso depois
 
-        const headX = board.snake[board.snake.length - 1].column;
-        const headY = board.snake[board.snake.length - 1].line;
-        //console.log("aqui",headX, headY);
+        const headX = this.board.snake[this.board.snake.length - 1].column;
+        const headY = this.board.snake[this.board.snake.length - 1].line;
+        //console.log("snake",headX, headY, "fruit", fruitX, fruitY);
 
         // <<< Não está random aqui
         let choiceRandom = null;
@@ -430,18 +472,18 @@ class Ai {
 
             if(!this.firstTime){
                 if(
-                    (this.targetVerify === "ArrowRight" && board.keySwitch === "ArrowLeft") ||
-                    (this.targetVerify === "ArrowUp" && board.keySwitch === "ArrowDown") ||
-                    (this.targetVerify === "ArrowDown" && board.keySwitch === "ArrowUp") ||
-                    (this.targetVerify === "ArrowLeft" && board.keySwitch === "ArrowRight")
+                    (this.targetVerify === "ArrowRight" && this.board.keySwitch === "ArrowLeft") ||
+                    (this.targetVerify === "ArrowUp" && this.board.keySwitch === "ArrowDown") ||
+                    (this.targetVerify === "ArrowDown" && this.board.keySwitch === "ArrowUp") ||
+                    (this.targetVerify === "ArrowLeft" && this.board.keySwitch === "ArrowRight")
                 ){
                     return false;
                 }
             } else {
                 if(
-                    (this.targetVerify === "ArrowUp" && board.keySwitch === "ArrowDown") ||
-                    (this.targetVerify === "ArrowDown" && board.keySwitch === "ArrowUp") ||
-                    (this.targetVerify === "ArrowLeft" && board.keySwitch === "ArrowRight")
+                    (this.targetVerify === "ArrowUp" && this.board.keySwitch === "ArrowDown") ||
+                    (this.targetVerify === "ArrowDown" && this.board.keySwitch === "ArrowUp") ||
+                    (this.targetVerify === "ArrowLeft" && this.board.keySwitch === "ArrowRight")
                 ){
                     return false;
                 } else {
@@ -465,30 +507,30 @@ class Ai {
 
             if(sense === "horizontal") {
                 if(sign === "positive"){
-                    if(headX !== (board.column - 1)) {
-                        bodySnake = document.querySelector(`#c${headX + 1}l${headY}`);
+                    if(headX !== (this.board.column - 1)) {
+                        bodySnake = document.querySelector(`#c${headX + 1}l${headY}b${this.numberBoard}`);
                     } else {
-                        bodySnake = document.querySelector(`#c0l${headY}`);
+                        bodySnake = document.querySelector(`#c0l${headY}b${this.numberBoard}`);
                     }
                 } else {
                     if(headX !== 0) {
-                        bodySnake = document.querySelector(`#c${headX - 1}l${headY}`);
+                        bodySnake = document.querySelector(`#c${headX - 1}l${headY}b${this.numberBoard}`);
                     } else {
-                        bodySnake = document.querySelector(`#c${board.column - 1}l${headY}`);
+                        bodySnake = document.querySelector(`#c${this.board.column - 1}l${headY}b${this.numberBoard}`);
                     }
                 }
             } else {
                 if(sign === "positive"){
-                    if(headY !== (board.line - 1)) {
-                        bodySnake = document.querySelector(`#c${headX}l${headY + 1}`);
+                    if(headY !== (this.board.line - 1)) {
+                        bodySnake = document.querySelector(`#c${headX}l${headY + 1}b${this.numberBoard}`);
                     } else {
-                        bodySnake = document.querySelector(`#c${headX}l0`);
+                        bodySnake = document.querySelector(`#c${headX}l0b${this.numberBoard}`);
                     }
                 } else {
                     if(headY !== 0) {
-                        bodySnake = document.querySelector(`#c${headX}l${headY - 1}`);
+                        bodySnake = document.querySelector(`#c${headX}l${headY - 1}b${this.numberBoard}`);
                     } else {
-                        bodySnake = document.querySelector(`#c${headX}l${board.line - 1}`);
+                        bodySnake = document.querySelector(`#c${headX}l${this.board.line - 1}b${this.numberBoard}`);
                     }
                 }
             }
@@ -499,7 +541,7 @@ class Ai {
             }
 
             if(bodySnake.classList.contains("body")) {
-                //console.log("vai dar merda", console.log(document.querySelector(`#c${headX}l${headY}`), bodySnake, sense, sign));
+                //console.log("vai dar merda", console.log(bodySnake, this.numberBoard));
                 //alert("Inteligência artificial teste :)");
                 choiceRandom = Math.floor(Math.random() * 4);
                 verify = verifyMove();
@@ -569,7 +611,7 @@ class Ai {
         // >>> Não está random aqui
 
         /*VERIFICAR*/
-        if(this.targetVerify === board.keySwitch){
+        if(this.targetVerify === this.board.keySwitch){
             return;
         }
 
@@ -577,8 +619,12 @@ class Ai {
             return;
         }
 
-        board.keySwitch = this.targetVerify;
+        this.board.keySwitch = this.targetVerify;
         /*VERIFICAR*/
+    }
+
+    redeNeural() {
+
     }
 }
 
@@ -603,14 +649,14 @@ function createMenu(menu, message, key, type = "") {
             const food = document.querySelector(".food");
             food ? food.classList.remove("food") : null;
 
-            document.querySelectorAll(".square").forEach(value => {
+            document.querySelectorAll(".board").forEach(value => {
                 value.remove();
             });
 
             menu.remove();
 
             setTimeout(() => {
-                board = new Board(columnBoard, lineBoard);
+                board = new Board(columnBoard, lineBoard, 1);
                 board.build();
             }, 200);
         }
@@ -966,7 +1012,7 @@ const updateName = () => {
     menuItens.style.display = "none";
     document.querySelector("#menuHamburguerSpan").style.color = "black";
 
-    createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "Mudar Nome", "newName", "dontStop");
+    createMenu(document.querySelector(".boardArea").appendChild(document.createElement("div")), "Mudar Nome", "newName", "dontStop");
 };
 
 const snakeColor = () => {
@@ -977,7 +1023,7 @@ const snakeColor = () => {
     menuItens.style.display = "none";
     document.querySelector("#menuHamburguerSpan").style.color = "black";
 
-    createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "Mudar Cor", "switchColor", "dontStop");
+    createMenu(document.querySelector(".boardArea").appendChild(document.createElement("div")), "Mudar Cor", "switchColor", "dontStop");
 };
 
 const createAccount = () => {
@@ -996,7 +1042,7 @@ const createAccount = () => {
     maxScore[positionBoard] = board.score;
     localStorage.score = JSON.stringify(maxScore);
 
-    createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "Cadastrar User", "saveScore", "dontStop");
+    createMenu(document.querySelector(".boardArea").appendChild(document.createElement("div")), "Cadastrar User", "saveScore", "dontStop");
 };
 
 const getBoard = () => {
@@ -1007,11 +1053,19 @@ const getBoard = () => {
     menuItens.style.display = "none";
     document.querySelector("#menuHamburguerSpan").style.color = "black";
 
-    createMenu(document.querySelector(".board").appendChild(document.createElement("div")), "Mudar Tamanho", "getBoard", "dontStop");
+    createMenu(document.querySelector(".boardArea").appendChild(document.createElement("div")), "Mudar Tamanho", "getBoard", "dontStop");
 };
 
 loadName();
 
-let board = new Board(columnBoard, lineBoard);
+let board = new Board(columnBoard, lineBoard, 1);
 
 board.build();
+
+let boards = [];
+
+for (let i = 2; i <= quantidadeTeste; i++) {
+    const newboards = new Board(columnBoard, lineBoard, i);
+    boards.push(newboards);
+    boards[boards.length - 1].build();
+}
